@@ -2,8 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
 body {
-  @apply bg-body text-white antialiased;
+  @apply overflow-x-hidden;
+}
+
+body {
+  @apply relative bg-body text-white antialiased;
 }
 
 .btn_hover:not(:disabled):hover {
