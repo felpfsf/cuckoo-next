@@ -5,3 +5,7 @@
 body {
   @apply bg-body text-white antialiased;
 }
+
+.btn_hover:not(:disabled):hover {
+  @apply bg-fuchsia-800;
+}
