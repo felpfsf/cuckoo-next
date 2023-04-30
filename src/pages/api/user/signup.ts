@@ -1,8 +1,7 @@
-import { prisma } from "@/lib/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 import crypto from "crypto";
-
-import { RegisterInputProps, registerSchema } from "../../register";
+import { prisma } from "@/lib/prisma";
+import { RegisterInputProps, registerSchema } from "../../auth/register";
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,7 +17,9 @@ export default async function handler(
       // console.log("Aqui é o servidor", body);
       const temp = await checkIfUserAlreadyExists(body.email);
       if (temp) {
-        return res.status(500).send({ message: "Usuário já cadastrado com esse e-mail" });
+        return res
+          .status(500)
+          .send({ message: "Usuário já cadastrado com esse e-mail" });
       }
 
       const user = await handleCreateUser(body);
