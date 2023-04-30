@@ -1,25 +1,74 @@
+import { useState } from "react";
+import { useRouter } from "next/router";
 import Link from "next/link";
+
+import { AxiosError } from "axios";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
-import Balancer from "react-wrap-balancer";
-import PublicLayout from "@/components/PublicLayout";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { api } from "@/lib/axios";
-import { signIn } from "next-auth/react";
+import Balancer from "react-wrap-balancer";
+
+import PublicLayout from "@/components/PublicLayout";
+
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { FiAlertCircle, FiEyeOff, FiEye } from "react-icons/fi";
+
+export const registerSchema = z
+  .object({
+    name: z.string().min(3, "Nome é obrigatório"),
+    email: z
+      .string()
+      .email("Formato de email incorreto")
+      .min(1, "Email é obrigatorio"),
+    password: z.string().min(6, "A senha é obrigatória"),
+    passwordConfirmation: z.string({
+      required_error: "É necessário confirmar sua senha",
+    }),
+  })
+  .refine((data) => data.password === data.passwordConfirmation, {
+    message: "As senhas não conferem",
+    path: ["passwordConfirmation"],
+  });
+
+export type RegisterInputProps = z.infer<typeof registerSchema>;
 
 export default function SignUp() {
+  const [authError, setAuthError] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const router = useRouter();
+
+  const handleShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   const {
-    formState: { errors },
+    formState: { errors, isSubmitting },
     handleSubmit,
     register,
-  } = useForm();
+  } = useForm<RegisterInputProps>({ resolver: zodResolver(registerSchema) });
 
   const submitUser = async (data: any) => {
-    console.log("Register data ->", data);
+    // console.log("Register data ->", data);
     try {
-      await api.post("/api/user/signup", data);
+      await api.post("/api/user/signup", data).then((response) => {
+        if (response.data) {
+          router.push("/login");
+        }
+      });
     } catch (error) {
-      console.error("Error registering ->", error);
+      if (error instanceof AxiosError) {
+        if (error.response) {
+          console.log("Error registering ->", error?.response.data.message);
+          setAuthError(error.response.data.message);
+        }
+      } else {
+        console.error("Erro inexperado", error);
+      }
     }
   };
+
   return (
     <PublicLayout pageTitle='Registre-se - Cuckoo'>
       <div className='text-center'>
@@ -39,48 +88,140 @@ export default function SignUp() {
         className='mx-auto flex max-w-md flex-col gap-12'
         onSubmit={handleSubmit(submitUser)}
       >
-        <div className='flex flex-col gap-2'>
+        <div className='relative flex flex-col gap-2'>
           <label htmlFor=''>Nome</label>
           <input
             type='text'
             placeholder='Digite seu nome'
             className='border-b bg-transparent p-2 text-white outline-fuchsia-500'
             {...register("name")}
+            aria-invalid={errors.name ? "true" : "false"}
+            aria-describedby={errors.name ? "name-error" : undefined}
           />
+          {errors.name && (
+            <div
+              id='name-error'
+              role='alert'
+              className='absolute -bottom-6 flex items-center gap-2 text-sm text-red-500'
+            >
+              <FiAlertCircle size={16} />
+              <span>{errors.name?.message}</span>
+            </div>
+          )}
         </div>
-        <div className='flex flex-col gap-2'>
-          <label htmlFor=''>Email</label>
+        <div className='relative flex flex-col gap-2'>
+          <label htmlFor='email'>Email</label>
           <input
             type='email'
             placeholder='Digite seu email'
             className='border-b bg-transparent p-2 text-white outline-fuchsia-500'
             {...register("email")}
+            aria-invalid={errors.email ? "true" : "false"}
+            aria-describedby={errors.email ? "email-error" : undefined}
           />
+          {errors.email && (
+            <div
+              id='email-error'
+              role='alert'
+              className='absolute -bottom-6 flex items-center gap-2 text-sm text-red-500'
+            >
+              <FiAlertCircle size={16} />
+              <span>{errors.email?.message}</span>
+            </div>
+          )}
         </div>
-        <div className='flex flex-col gap-2'>
-          <label htmlFor=''>Senha</label>
+        <div className='relative flex flex-col gap-2'>
+          <label htmlFor='password'>Senha</label>
           <input
-            type='password'
+            type={showPassword ? "text" : "password"}
             placeholder='Digite sua senha'
-            className='border-b bg-transparent p-2 text-white outline-fuchsia-500'
+            className='relative w-full border-b bg-transparent p-2 text-white outline-fuchsia-500'
             {...register("password")}
+            aria-invalid={errors.password ? "true" : "false"}
+            aria-describedby={errors.password ? "password-error" : undefined}
           />
+          <button
+            className='absolute bottom-4 right-2'
+            type='button'
+            aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
+            onClick={handleShowPassword}
+          >
+            {showPassword ? <FiEye /> : <FiEyeOff />}
+          </button>
+          {errors.password && (
+            <div
+              id='password-error'
+              role='alert'
+              className='absolute -bottom-6 flex items-center gap-2 text-sm text-red-500'
+            >
+              <FiAlertCircle size={16} />
+              <span>{errors.password?.message}</span>
+            </div>
+          )}
         </div>
-        <div className='flex flex-col gap-2'>
-          <label htmlFor=''>Confirme sua senha</label>
+        <div className='relative flex flex-col gap-2'>
+          <label htmlFor='password-confirmation'>Confirme sua senha</label>
           <input
-            type='password'
+            type={showPassword ? "text" : "password"}
             placeholder='Confirme sua senha'
             className='border-b bg-transparent p-2 text-white outline-fuchsia-500'
-            {...register("confirm_password")}
+            {...register("passwordConfirmation")}
+            aria-invalid={errors.passwordConfirmation ? "true" : "false"}
+            aria-describedby={
+              errors.passwordConfirmation
+                ? "password-confirmation-error"
+                : undefined
+            }
           />
+          <button
+            className='absolute bottom-4 right-2'
+            type='button'
+            aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
+            onClick={handleShowPassword}
+          >
+            {showPassword ? <FiEye /> : <FiEyeOff />}
+          </button>
+          {errors.passwordConfirmation && (
+            <div
+              id='password-confirmation-error'
+              role='alert'
+              className='absolute -bottom-6 flex items-center gap-2 text-sm text-red-500'
+            >
+              <FiAlertCircle size={16} />
+              <span>{errors.passwordConfirmation?.message}</span>
+            </div>
+          )}
         </div>
-        <button
-          className='btn_hover rounded-3xl border border-none bg-fuchsia-600 p-3 font-semibold transition-colors duration-200 ease-in-out disabled:cursor-not-allowed disabled:opacity-60'
-          disabled={false}
-        >
-          Entrar
-        </button>
+        <div className='relative w-full'>
+          {authError && (
+            <Balancer>
+              <span
+                id='auth-error'
+                role='alert'
+                className='absolute -top-8 flex w-full items-center justify-center gap-2 text-center text-sm text-red-500'
+              >
+                <FiAlertCircle size={16} />
+                {authError}
+              </span>
+            </Balancer>
+          )}
+          <button
+            type='submit'
+            disabled={isSubmitting}
+            aria-busy={isSubmitting ? "true" : "false"}
+            aria-describedby={authError ? "auth-error" : undefined}
+            className='btn_hover flex w-full items-center justify-center rounded-3xl border border-none bg-fuchsia-600 p-3 font-semibold text-white transition-colors duration-200 ease-in-out disabled:cursor-not-allowed  disabled:opacity-60'
+          >
+            {isSubmitting ? (
+              <div className='flex items-center gap-2'>
+                <AiOutlineLoading3Quarters size={18} className='animate-spin' />
+                Carregando...
+              </div>
+            ) : (
+              "Entrar"
+            )}
+          </button>
+        </div>
       </form>
     </PublicLayout>
   );
