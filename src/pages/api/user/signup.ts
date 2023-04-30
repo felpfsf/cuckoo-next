@@ -2,12 +2,7 @@ import { prisma } from "@/lib/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 import crypto from "crypto";
 
-interface UserData {
-  name: string;
-  password: string;
-  confirm_password: string;
-  email: string;
-}
+import { RegisterInputProps, registerSchema } from "../../register";
 
 export default async function handler(
   req: NextApiRequest,
@@ -17,24 +12,23 @@ export default async function handler(
     if (!req.body)
       return res.status(404).json({ error: "Form data unavailable" });
 
-    const body = req.body;
-    console.log("Aqui é o servidor", body);
-
     // Checando se o usuário existe
     try {
+      const body = registerSchema.parse(req.body);
+      // console.log("Aqui é o servidor", body);
       const temp = await checkIfUserAlreadyExists(body.email);
-      if (temp) return res.status(500).end({ message: "User already exists" });
+      if (temp) {
+        return res.status(500).send({ message: "Usuário já cadastrado com esse e-mail" });
+      }
 
       const user = await handleCreateUser(body);
       // Enviando a resposta
-      return res
-        .status(201)
-        .json({ message: "User created successfully", user });
+      return res.status(201).send({ message: "Usuário criado com sucesso" });
     } catch (error) {
       console.error(error);
     }
   } else {
-    res.status(500).json({
+    res.status(500).send({
       message: "HTTP method not supported, only POST method is supported",
     });
   }
@@ -57,8 +51,8 @@ const hashPassword = (password: string) => {
   return { hash, salt };
 };
 
-const handleCreateUser = async (body: UserData) => {
-  const { confirm_password, password, ...rest } = body;
+const handleCreateUser = async (body: RegisterInputProps) => {
+  const { passwordConfirmation, password, ...rest } = body;
   const { hash, salt } = hashPassword(password);
   const data = { password: hash, salt, ...rest };
   const user = await prisma.user.create({
