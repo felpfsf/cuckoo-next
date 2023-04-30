@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { GetServerSideProps } from "next";
+import type { GetServerSideProps } from "next";
 import { getSession, signIn } from "next-auth/react";
 
 import { AxiosError } from "axios";
@@ -16,8 +16,8 @@ import PublicLayout from "@/components/PublicLayout";
 
 import { FiAlertCircle, FiEye, FiEyeOff } from "react-icons/fi";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import IconGoogle from "../../assets/google_icon.svg";
-import IconGithub from "../../assets/github_icon.svg";
+import IconGoogle from "../../../assets/google_icon.svg";
+import IconGithub from "../../../assets/github_icon.svg";
 
 export const loginSchema = z.object({
   email: z
@@ -75,7 +75,10 @@ export default function SignIn() {
           </h1>
           <small className=''>
             Não tem uma conta? Registre-se{" "}
-            <Link href={"/register"} className='underline underline-offset-2'>
+            <Link
+              href={"/auth/register"}
+              className='underline underline-offset-2'
+            >
               aqui
             </Link>
           </small>

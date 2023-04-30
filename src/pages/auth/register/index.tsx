@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { getSession } from "next-auth/react";
+import type { GetServerSideProps } from "next";
 import Link from "next/link";
 
 import { AxiosError } from "axios";
@@ -54,7 +56,7 @@ export default function SignUp() {
     try {
       await api.post("/api/user/signup", data).then((response) => {
         if (response.data) {
-          router.push("/login");
+          router.push("/auth/login");
         }
       });
     } catch (error) {
@@ -78,7 +80,7 @@ export default function SignUp() {
           </h1>
           <small className=''>
             Já tem uma conta? Faça o login{" "}
-            <Link href={"/login"} className='underline underline-offset-2'>
+            <Link href={"/auth/login"} className='underline underline-offset-2'>
               aqui
             </Link>
           </small>
@@ -93,10 +95,10 @@ export default function SignUp() {
           <input
             type='text'
             placeholder='Digite seu nome'
-            className='border-b bg-transparent p-2 text-white outline-fuchsia-500'
-            {...register("name")}
             aria-invalid={errors.name ? "true" : "false"}
             aria-describedby={errors.name ? "name-error" : undefined}
+            className='border-b bg-transparent p-2 text-white outline-fuchsia-500'
+            {...register("name")}
           />
           {errors.name && (
             <div
@@ -114,10 +116,10 @@ export default function SignUp() {
           <input
             type='email'
             placeholder='Digite seu email'
-            className='border-b bg-transparent p-2 text-white outline-fuchsia-500'
-            {...register("email")}
             aria-invalid={errors.email ? "true" : "false"}
             aria-describedby={errors.email ? "email-error" : undefined}
+            className='border-b bg-transparent p-2 text-white outline-fuchsia-500'
+            {...register("email")}
           />
           {errors.email && (
             <div
@@ -135,10 +137,10 @@ export default function SignUp() {
           <input
             type={showPassword ? "text" : "password"}
             placeholder='Digite sua senha'
-            className='relative w-full border-b bg-transparent p-2 text-white outline-fuchsia-500'
-            {...register("password")}
             aria-invalid={errors.password ? "true" : "false"}
             aria-describedby={errors.password ? "password-error" : undefined}
+            className='relative w-full border-b bg-transparent p-2 text-white outline-fuchsia-500'
+            {...register("password")}
           />
           <button
             className='absolute bottom-4 right-2'
@@ -163,20 +165,20 @@ export default function SignUp() {
           <label htmlFor='password-confirmation'>Confirme sua senha</label>
           <input
             type={showPassword ? "text" : "password"}
-            placeholder='Confirme sua senha'
-            className='border-b bg-transparent p-2 text-white outline-fuchsia-500'
-            {...register("passwordConfirmation")}
             aria-invalid={errors.passwordConfirmation ? "true" : "false"}
             aria-describedby={
               errors.passwordConfirmation
                 ? "password-confirmation-error"
                 : undefined
             }
+            placeholder='Confirme sua senha'
+            className='border-b bg-transparent p-2 text-white outline-fuchsia-500'
+            {...register("passwordConfirmation")}
           />
           <button
-            className='absolute bottom-4 right-2'
             type='button'
             aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
+            className='absolute bottom-4 right-2'
             onClick={handleShowPassword}
           >
             {showPassword ? <FiEye /> : <FiEyeOff />}
@@ -226,3 +228,18 @@ export default function SignUp() {
     </PublicLayout>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getSession(context);
+  if (session) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+  return {
+    props: { session },
+  };
+};
