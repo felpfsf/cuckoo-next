@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { signOut, useSession } from "next-auth/react";
+import Link from "next/link";
 
 function Home() {
   const { data: session } = useSession();
@@ -10,8 +11,12 @@ function Home() {
       <Head>
         <title>Home</title>
       </Head>
-      <div>
-        <h1>Home, olá {session?.user?.name}</h1>
+      <div className='flex flex-col gap-4'>
+        <h1>
+          Home, <br />
+          olá {session?.user?.name}
+        </h1>
+        <Link href={"/dashboard"}>Dashboard</Link>
         <button onClick={() => signOut()}>Sair</button>
       </div>
     </>
