@@ -1,35 +1,55 @@
-import Link from "next/link";
-import Image from "next/image";
-import PublicLayout from "@/components/PublicLayout";
-import Balancer from "react-wrap-balancer";
-import IconGoogle from "../../assets/google_icon.svg";
-import IconGithub from "../../assets/github_icon.svg";
+import { useState } from "react";
+import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
 import { getSession, signIn } from "next-auth/react";
+
+import { AxiosError } from "axios";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/router";
-import { useState } from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import Link from "next/link";
+import Image from "next/image";
+import Balancer from "react-wrap-balancer";
+
+import PublicLayout from "@/components/PublicLayout";
+
+import { FiAlertCircle, FiEye, FiEyeOff } from "react-icons/fi";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import IconGoogle from "../../assets/google_icon.svg";
+import IconGithub from "../../assets/github_icon.svg";
+
+export const loginSchema = z.object({
+  email: z
+    .string()
+    .email("Formato de email incorreto")
+    .min(1, "Email é obrigatório"),
+  password: z.string().min(6, "A senha é obrigatória"),
+});
+
+export type LoginInputProps = z.infer<typeof loginSchema>;
 
 export default function SignIn() {
   const [authError, setAuthError] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const router = useRouter();
+  const handleShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
   const {
-    formState: { errors },
+    formState: { errors, isSubmitting },
     handleSubmit,
     register,
-  } = useForm();
+  } = useForm<LoginInputProps>({ resolver: zodResolver(loginSchema) });
 
-  const submitLoginUser = async (data: any) => {
-    console.log("Register data ->", data);
+  const submitLoginUser = async (data: LoginInputProps) => {
+    // console.log("Login data ->", data);
     try {
       const res = await signIn("credentials", {
         callbackUrl: "/",
         redirect: false,
         ...data,
       });
-      console.log(res?.status);
-      console.log(res?.ok);
-      console.log(res?.url);
       if (res?.ok) {
         router.push("/");
       } else {
@@ -37,7 +57,13 @@ export default function SignIn() {
         setAuthError(res?.error as string);
       }
     } catch (error) {
-      console.error("Error registering ->", error);
+      if (error instanceof AxiosError) {
+        if (error.response) {
+          console.log("Error registering ->", error?.response.data.message);
+        }
+      } else {
+        console.error("Erro inexperado", error);
+      }
     }
   };
   return (
@@ -59,37 +85,84 @@ export default function SignIn() {
         className='mx-auto mt-8 flex max-w-md flex-col gap-12'
         onSubmit={handleSubmit(submitLoginUser)}
       >
-        <div className='flex flex-col gap-2'>
+        <div className='relative flex flex-col gap-2'>
           <label htmlFor=''>Email</label>
           <input
             type='email'
+            aria-invalid={errors.email ? "true" : "false"}
+            aria-describedby={errors.email ? "email-error" : undefined}
             placeholder='Digite seu email'
             {...register("email")}
             className='border-b bg-transparent p-2 text-white outline-fuchsia-500'
           />
+          {errors.email && (
+            <div
+              id='email-error'
+              role='alert'
+              className='absolute -bottom-6 flex items-center gap-2 text-sm text-red-500'
+            >
+              <FiAlertCircle size={16} />
+              <span>{errors.email?.message}</span>
+            </div>
+          )}
         </div>
-        <div className='flex flex-col gap-2'>
+        <div className='relative flex flex-col gap-2'>
           <label htmlFor=''>Senha</label>
           <input
-            type='password'
+            type={showPassword ? "text" : "password"}
+            aria-invalid={errors.password ? "true" : "false"}
+            aria-describedby={errors.password ? "password-error" : undefined}
             placeholder='Digite sua senha'
             {...register("password")}
-            className='border-b bg-transparent p-2 text-white outline-fuchsia-500'
+            className='relative border-b bg-transparent p-2 text-white outline-fuchsia-500'
           />
+          <button
+            className='absolute bottom-3 right-2'
+            type='button'
+            aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
+            onClick={handleShowPassword}
+          >
+            {showPassword ? <FiEye /> : <FiEyeOff />}
+          </button>
+          {errors.password && (
+            <div
+              id='password-error'
+              role='alert'
+              className='absolute -bottom-6 flex items-center gap-2 text-sm text-red-500'
+            >
+              <FiAlertCircle />
+              <span>{errors.password?.message}</span>
+            </div>
+          )}
         </div>
         <div className='relative w-full'>
           {
             <Balancer>
-              <span className='absolute -top-8 w-full text-center text-sm text-red-500'>
+              <span
+                id='auth-error'
+                role='alert'
+                className='absolute -top-8 w-full text-center text-sm text-red-500'
+              >
                 {authError}
+                {errors.root?.message}
               </span>
             </Balancer>
           }
           <button
-            className='btn_hover w-full rounded-3xl border border-none bg-fuchsia-600 p-3 font-semibold transition-colors duration-200 ease-in-out disabled:cursor-not-allowed disabled:opacity-60'
-            disabled={false}
+            type='submit'
+            disabled={isSubmitting}
+            aria-busy={isSubmitting ? "true" : "false"}
+            aria-describedby={authError ? "auth-error" : undefined}
+            className='btn_hover flex w-full items-center justify-center rounded-3xl border border-none bg-fuchsia-600 p-3 font-semibold text-white transition-colors duration-200 ease-in-out disabled:cursor-not-allowed  disabled:opacity-60'
           >
-            Entrar
+            {isSubmitting ? (
+              <div className='flex items-center gap-2'>
+                <AiOutlineLoading3Quarters size={18} className='animate-spin' />
+                Carregando...
+              </div>
+            ) : (
+              "Entrar"
+            )}
           </button>
         </div>
       </form>
@@ -108,6 +181,7 @@ export default function SignIn() {
           <button
             title='Entre usando sua conta Github'
             disabled
+            aria-disabled='true'
             className='flex flex-col items-center gap-2 disabled:cursor-not-allowed'
             onClick={() => signIn("github")}
           >
