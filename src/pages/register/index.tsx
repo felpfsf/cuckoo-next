@@ -1,9 +1,25 @@
-import PublicLayout from "@/components/PublicLayout";
-import Head from "next/head";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
 import Balancer from "react-wrap-balancer";
+import PublicLayout from "@/components/PublicLayout";
+import { api } from "@/lib/axios";
+import { signIn } from "next-auth/react";
 
 export default function SignUp() {
+  const {
+    formState: { errors },
+    handleSubmit,
+    register,
+  } = useForm();
+
+  const submitUser = async (data: any) => {
+    console.log("Register data ->", data);
+    try {
+      await api.post("/api/user/signup", data);
+    } catch (error) {
+      console.error("Error registering ->", error);
+    }
+  };
   return (
     <PublicLayout pageTitle='Registre-se - Cuckoo'>
       <div className='text-center'>
@@ -19,13 +35,17 @@ export default function SignUp() {
           </small>
         </Balancer>
       </div>
-      <form className='mx-auto flex max-w-md flex-col gap-12'>
+      <form
+        className='mx-auto flex max-w-md flex-col gap-12'
+        onSubmit={handleSubmit(submitUser)}
+      >
         <div className='flex flex-col gap-2'>
           <label htmlFor=''>Nome</label>
           <input
             type='text'
             placeholder='Digite seu nome'
             className='border-b bg-transparent p-2 text-white outline-fuchsia-500'
+            {...register("name")}
           />
         </div>
         <div className='flex flex-col gap-2'>
@@ -34,6 +54,7 @@ export default function SignUp() {
             type='email'
             placeholder='Digite seu email'
             className='border-b bg-transparent p-2 text-white outline-fuchsia-500'
+            {...register("email")}
           />
         </div>
         <div className='flex flex-col gap-2'>
@@ -42,6 +63,7 @@ export default function SignUp() {
             type='password'
             placeholder='Digite sua senha'
             className='border-b bg-transparent p-2 text-white outline-fuchsia-500'
+            {...register("password")}
           />
         </div>
         <div className='flex flex-col gap-2'>
@@ -50,6 +72,7 @@ export default function SignUp() {
             type='password'
             placeholder='Confirme sua senha'
             className='border-b bg-transparent p-2 text-white outline-fuchsia-500'
+            {...register("confirm_password")}
           />
         </div>
         <button
