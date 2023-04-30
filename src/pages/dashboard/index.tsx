@@ -15,7 +15,7 @@ export default function Dashboard() {
   if (status === "unauthenticated") {
     return (
       <MainLayout pageTitle='Dashboard - Cuckoo'>
-        <p>Acesso Negado</p>
+        <p>Acesso Negado, volte à página inicial</p>
       </MainLayout>
     );
   }
