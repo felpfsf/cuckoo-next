@@ -46,6 +46,8 @@ model User {
   name          String?
   email         String?   @unique
   emailVerified DateTime?
+  password      String?
+  salt          String?
   image         String?
   createdAt     DateTime  @default(now())
   updateAt      DateTime  @updatedAt
@@ -86,6 +88,7 @@ model Like {
   postId    String
   user      User     @relation(fields: [userId], references: [id])
   userId    String
+
   @@unique([postId, userId])
 }
 
