@@ -23,7 +23,7 @@ export default function MainLayout({ children, pageTitle }: LayoutProps) {
         <Navbar />
         <Footer />
         <motion.section
-          className='flex min-h-screen w-full max-w-[864px] flex-col gap-4 sm:ml-20 lg:ml-[220px] lg:p-6'
+          className='flex min-h-screen w-full max-w-[864px] flex-col gap-4 border-r border-gray-800 sm:ml-20 lg:ml-[220px] lg:py-6 lg:pl-6 pb-20'
           initial={{ x: 300, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: 300, opacity: 0 }}

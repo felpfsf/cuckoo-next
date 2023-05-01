@@ -5,7 +5,7 @@ import { FiLogOut } from "react-icons/fi";
 export default function Footer() {
   return (
     <footer className='fixed bottom-0 w-full border-t bg-body p-4 sm:hidden'>
-      <nav>
+      <nav role='navigation'>
         <ul className='flex items-center justify-evenly gap-16'>
           <li>
             <Link href={"/"} aria-label='Link para a Home' tabIndex={1}>
