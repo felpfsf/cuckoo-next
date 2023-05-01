@@ -87,7 +87,7 @@ export default function SignUp() {
         </Balancer>
       </div>
       <form
-        className='mx-auto flex max-w-md flex-col gap-12'
+        className='mx-auto flex max-w-md flex-col gap-12 pb-4 mt-6'
         onSubmit={handleSubmit(submitUser)}
       >
         <div className='relative flex flex-col gap-2'>
