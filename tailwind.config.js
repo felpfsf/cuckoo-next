@@ -21,6 +21,25 @@ module.exports = {
       colors: {
         body: "#050214",
       },
+      keyframes: {
+        overlayShown: {
+          from: { opacity: 0 },
+          to: { opacity: 1 },
+        },
+        contentShown: {
+          from: { opacity: 0, transform: "translateY(100%)" },
+          to: { opacity: 1, transform: "translateY(-10px) " },
+        },
+        contentShownSm: {
+          from: { opacity: 0, transform: "translate(-50%, 100%)" },
+          to: { opacity: 1, transform: "translate(-50%, -35%) " },
+        },
+      },
+      animation: {
+        overlayShown: "overlayShown 0.2s ease-in-out",
+        contentShown: "contentShown 0.3s ease-in-out",
+        contentShownSm: "contentShownSm 0.3s ease-in-out",
+      },
     },
   },
   plugins: [],
