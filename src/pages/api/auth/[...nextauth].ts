@@ -11,6 +11,19 @@ interface PasswordProps {
   salt: string;
 }
 
+const generateUsernameFromName = (name: string): string => {
+  // Convert the name to lowercase and remove any special characters
+  const sanitized = name.toLowerCase().replace(/[^a-z0-9]/g, "");
+  // Split the name into first and last name
+  const parts = sanitized.split(" ");
+  // Combine the first two parts of the name (or just the first part if only one name is provided)
+  const username = parts[0] + (parts.length > 1 ? parts[1] : "");
+  // Add a random number at the end to ensure uniqueness
+  const randomNumber = Math.floor(Math.random() * 1000);
+  const generatedUsername = `${username}${randomNumber}`;
+  return generatedUsername;
+};
+
 const checkIfUserAlreadyExists = async (email: string) => {
   return await prisma.user.findUnique({
     where: { email },
@@ -26,6 +39,7 @@ const verifyPassword = ({ candidatePassword, hash, salt }: PasswordProps) => {
 
   return result;
 };
+
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -74,6 +88,23 @@ export const authOptions: AuthOptions = {
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, account, profile }) {
+      if (account?.provider === "google") {
+        token.name = profile?.name;
+        token.username = generateUsernameFromName(profile?.name!);
+        console.log(token.username);
+      }
+
+      // Return the token object
+      console.log(token);
+      return token;
+    },
+    async session({ session, token }) {
+      session.user = token;
+      return session;
+    },
+  },
   secret: process.env.NEXT_AUTH_SECRET,
   session: {
     strategy: "jwt",

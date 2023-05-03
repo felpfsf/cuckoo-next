@@ -114,6 +114,27 @@ export default function SignUp() {
           )}
         </div>
         <div className='relative flex flex-col gap-2'>
+          <label htmlFor='username'>Nome de usuário</label>
+          <input
+            type='text'
+            placeholder='Defina seu nome de usuário'
+            aria-invalid={errors.username ? "true" : "false"}
+            aria-describedby={errors.username ? "username-error" : undefined}
+            className='border-b bg-transparent p-2 text-white outline-fuchsia-500'
+            {...register("username")}
+          />
+          {errors.username && (
+            <div
+              id='username-error'
+              role='alert'
+              className='absolute -bottom-6 flex items-center gap-2 text-sm text-red-500'
+            >
+              <FiAlertCircle size={16} />
+              <span>{errors.username?.message}</span>
+            </div>
+          )}
+        </div>
+        <div className='relative flex flex-col gap-2'>
           <label htmlFor='password'>Senha</label>
           <input
             type={showPassword ? "text" : "password"}
