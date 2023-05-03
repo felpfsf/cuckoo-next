@@ -3,6 +3,33 @@ import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { RegisterInputProps, registerSchema } from "../../auth/register";
 
+const checkIfUserAlreadyExists = async (email: string) => {
+  return await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+};
+
+const hashPassword = (password: string) => {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const hash = crypto
+    .pbkdf2Sync(password, salt, 1000, 64, "sha512")
+    .toString("hex");
+
+  return { hash, salt };
+};
+
+const handleCreateUser = async (body: RegisterInputProps) => {
+  const { passwordConfirmation, password, ...rest } = body;
+  const { hash, salt } = hashPassword(password);
+  const data = { password: hash, salt, ...rest };
+  const user = await prisma.user.create({
+    data,
+  });
+  return user;
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -34,30 +61,3 @@ export default async function handler(
     });
   }
 }
-
-const checkIfUserAlreadyExists = async (email: string) => {
-  return await prisma.user.findUnique({
-    where: {
-      email,
-    },
-  });
-};
-
-const hashPassword = (password: string) => {
-  const salt = crypto.randomBytes(16).toString("hex");
-  const hash = crypto
-    .pbkdf2Sync(password, salt, 1000, 64, "sha512")
-    .toString("hex");
-
-  return { hash, salt };
-};
-
-const handleCreateUser = async (body: RegisterInputProps) => {
-  const { passwordConfirmation, password, ...rest } = body;
-  const { hash, salt } = hashPassword(password);
-  const data = { password: hash, salt, ...rest };
-  const user = await prisma.user.create({
-    data,
-  });
-  return user;
-};
