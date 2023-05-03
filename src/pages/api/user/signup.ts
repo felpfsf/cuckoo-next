@@ -40,10 +40,6 @@ export default async function handler(
   if (req.method === "POST") {
     if (!req.body)
       return res.status(405).json({ error: "Form data unavailable" });
-  } else {
-    res.status(500).json({
-      message: "HTTP method not supported, only POST method is supported",
-    });
     // Checando se o usuário existe
     try {
       const body = registerSchema.parse(req.body);
@@ -60,5 +56,9 @@ export default async function handler(
       console.error(error);
       return res.status(400).json({ message: "Dados inválidos" });
     }
+  } else {
+    res.status(500).json({
+      message: "HTTP method not supported, only POST method is supported",
+    });
   }
 }
