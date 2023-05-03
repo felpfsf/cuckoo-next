@@ -13,6 +13,7 @@ export type LoginInputProps = z.infer<typeof loginSchema>;
 export const registerSchema = z
   .object({
     name: z.string().min(3, "Nome é obrigatório"),
+    username: z.string().min(3, "Defina um nome de usuário"),
     email: z
       .string()
       .email("Formato de email incorreto")
@@ -28,3 +29,5 @@ export const registerSchema = z
   });
 
 export type RegisterInputProps = z.infer<typeof registerSchema>;
+
+export type FormInputs = LoginInputProps | RegisterInputProps;
