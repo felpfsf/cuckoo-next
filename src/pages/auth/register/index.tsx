@@ -5,7 +5,6 @@ import type { GetServerSideProps } from "next";
 import Link from "next/link";
 
 import { AxiosError } from "axios";
-import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -16,25 +15,7 @@ import PublicLayout from "@/components/PublicLayout";
 
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FiAlertCircle, FiEyeOff, FiEye } from "react-icons/fi";
-
-export const registerSchema = z
-  .object({
-    name: z.string().min(3, "Nome é obrigatório"),
-    email: z
-      .string()
-      .email("Formato de email incorreto")
-      .min(1, "Email é obrigatorio"),
-    password: z.string().min(6, "A senha é obrigatória"),
-    passwordConfirmation: z.string({
-      required_error: "É necessário confirmar sua senha",
-    }),
-  })
-  .refine((data) => data.password === data.passwordConfirmation, {
-    message: "As senhas não conferem",
-    path: ["passwordConfirmation"],
-  });
-
-export type RegisterInputProps = z.infer<typeof registerSchema>;
+import { RegisterInputProps, registerSchema } from "@/models/user.schemas";
 
 export default function SignUp() {
   const [authError, setAuthError] = useState<string>("");
@@ -87,7 +68,7 @@ export default function SignUp() {
         </Balancer>
       </div>
       <form
-        className='mx-auto flex max-w-md flex-col gap-12 pb-4 mt-6'
+        className='mx-auto mt-6 flex max-w-md flex-col gap-12 pb-4'
         onSubmit={handleSubmit(submitUser)}
       >
         <div className='relative flex flex-col gap-2'>
