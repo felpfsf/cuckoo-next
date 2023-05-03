@@ -98,6 +98,15 @@ export default function Navbar() {
               <Dialog.Trigger asChild>
                 <button aria-label='Botão para Postar' tabIndex={4}>
                   <ImPencil2 size={26} />
+                  <span
+                    className={`hidden border-b-2 text-2xl font-bold group-hover:border-b-neutral-200 lg:block ${
+                      pathname === "/friends"
+                        ? "border-b-neutral-200"
+                        : "border-b-transparent"
+                    }`}
+                  >
+                    Novo Post
+                  </span>
                 </button>
               </Dialog.Trigger>
               <CreatePost />
