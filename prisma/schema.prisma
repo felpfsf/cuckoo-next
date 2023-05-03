@@ -50,7 +50,7 @@ model User {
   salt          String?
   image         String?
   createdAt     DateTime  @default(now())
-  updateAt      DateTime  @updatedAt
+  updatedAt     DateTime  @updatedAt
   posts         Post[]
   accounts      Account[]
   sessions      Session[]
