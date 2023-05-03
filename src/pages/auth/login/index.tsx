@@ -5,7 +5,6 @@ import { getSession, signIn } from "next-auth/react";
 
 import { AxiosError } from "axios";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import Link from "next/link";
@@ -18,16 +17,7 @@ import { FiAlertCircle, FiEye, FiEyeOff } from "react-icons/fi";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import IconGoogle from "../../../assets/google_icon.svg";
 import IconGithub from "../../../assets/github_icon.svg";
-
-export const loginSchema = z.object({
-  email: z
-    .string()
-    .email("Formato de email incorreto")
-    .min(1, "Email é obrigatório"),
-  password: z.string().min(6, "A senha é obrigatória"),
-});
-
-export type LoginInputProps = z.infer<typeof loginSchema>;
+import { LoginInputProps, loginSchema } from "@/models/user.schemas";
 
 export default function SignIn() {
   const [authError, setAuthError] = useState<string>("");
