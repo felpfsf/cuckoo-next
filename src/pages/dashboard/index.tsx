@@ -1,8 +1,10 @@
 import MainLayout from "@/components/MainLayout";
 import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
+  const router = useRouter();
 
   if (status === "loading") {
     return (
@@ -13,6 +15,7 @@ export default function Dashboard() {
   }
 
   if (status === "unauthenticated") {
+    router.push("/auth/login");
     return (
       <MainLayout pageTitle='Dashboard - Cuckoo'>
         <p>Acesso Negado, volte à página inicial</p>
