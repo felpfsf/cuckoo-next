@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { signOut } from "next-auth/react";
+import * as Dialog from "@radix-ui/react-dialog";
 import { FaHome, FaUser, FaUsers } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
+import CreatePost from "../CreatePost";
+import { ImPencil2 } from "react-icons/im";
 
 export default function Navbar() {
   const { pathname } = useRouter();
@@ -75,20 +79,36 @@ export default function Navbar() {
               </span>
             </Link>
           </li>
-          <li className='w-full'>
-            <button
-              aria-label='Botão para Sair da sessão'
-              className='btn_hover hidden w-full items-center justify-center rounded-3xl border border-none bg-fuchsia-600 p-3 font-semibold text-white transition-colors duration-200 ease-in-out disabled:cursor-not-allowed disabled:opacity-60 lg:flex'
-              tabIndex={4}
-            >
-              Novo Post
-            </button>
+          {/* <li className='w-full'>
+            <Dialog.Root>
+              <Dialog.Trigger asChild>
+                <button
+                  aria-label='Botão para Postar'
+                  className='btn_hover hidden w-full items-center justify-center rounded-3xl border border-none bg-fuchsia-600 p-3 font-semibold text-white transition-colors duration-200 ease-in-out disabled:cursor-not-allowed disabled:opacity-60 lg:flex'
+                  tabIndex={4}
+                >
+                  Novo Post
+                </button>
+              </Dialog.Trigger>
+              <CreatePost />
+            </Dialog.Root>
+          </li> */}
+          <li>
+            <Dialog.Root>
+              <Dialog.Trigger asChild>
+                <button aria-label='Botão para Postar' tabIndex={4}>
+                  <ImPencil2 size={26} />
+                </button>
+              </Dialog.Trigger>
+              <CreatePost />
+            </Dialog.Root>
           </li>
           <li>
             <button
               className='flex items-center gap-3 text-2xl font-bold'
               aria-label='Botão para Sair da sessão'
               tabIndex={5}
+              onClick={() => signOut()}
             >
               <FiLogOut size={26} />
               <span className='hidden lg:block'>Sair</span>
