@@ -1,17 +1,20 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
-import { RegisterInputProps, registerSchema } from "../../auth/register";
+import { RegisterInputProps, registerSchema } from "@/models/user.schemas";
+
+interface HashedPassword {
+  hash: string;
+  salt: string;
+}
 
 const checkIfUserAlreadyExists = async (email: string) => {
-  return await prisma.user.findUnique({
-    where: {
-      email,
-    },
+  return prisma.user.findUnique({
+    where: { email },
   });
 };
 
-const hashPassword = (password: string) => {
+const hashPassword = (password: string): HashedPassword => {
   const salt = crypto.randomBytes(16).toString("hex");
   const hash = crypto
     .pbkdf2Sync(password, salt, 1000, 64, "sha512")
@@ -36,28 +39,26 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     if (!req.body)
-      return res.status(404).json({ error: "Form data unavailable" });
-
+      return res.status(405).json({ error: "Form data unavailable" });
+  } else {
+    res.status(500).json({
+      message: "HTTP method not supported, only POST method is supported",
+    });
     // Checando se o usuário existe
     try {
       const body = registerSchema.parse(req.body);
-      // console.log("Aqui é o servidor", body);
-      const temp = await checkIfUserAlreadyExists(body.email);
-      if (temp) {
+      const userExists = await checkIfUserAlreadyExists(body.email);
+      if (userExists) {
         return res
-          .status(500)
-          .send({ message: "Usuário já cadastrado com esse e-mail" });
+          .status(409)
+          .json({ message: "Usuário já cadastrado com esse e-mail" });
       }
-
-      const user = await handleCreateUser(body);
+      await handleCreateUser(body);
       // Enviando a resposta
-      return res.status(201).send({ message: "Usuário criado com sucesso" });
+      return res.status(201).json({ message: "Usuário criado com sucesso" });
     } catch (error) {
       console.error(error);
+      return res.status(400).json({ message: "Dados inválidos" });
     }
-  } else {
-    res.status(500).send({
-      message: "HTTP method not supported, only POST method is supported",
-    });
   }
 }
