@@ -1,3 +1,4 @@
+import { ChangeEvent, useState } from "react";
 import { useRouter } from "next/router";
 import { api } from "@/lib/axios";
 
@@ -12,21 +13,31 @@ import { FiAlertCircle } from "react-icons/fi";
 
 export default function CreatePost() {
   const router = useRouter();
+  const [charCount, setCharCount] = useState(0);
   const {
     formState: { errors, isSubmitting },
     handleSubmit,
     register,
-    reset
-  } = useForm<PostInputProps>({ resolver: zodResolver(postSchema) });
+    reset,
+  } = useForm<PostInputProps>({
+    resolver: zodResolver(postSchema),
+    defaultValues: { content: "" },
+    mode: "onChange",
+  });
+
+  const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const inputValue = e.target.value;
+    setCharCount(inputValue.length);
+  };
 
   const submitPost = async (data: PostInputProps) => {
     // console.log(data);
     try {
       const res = await api.post("api/compose/post", data);
-      if(res.status === 201){
-        router.push('/')
-        reset()
-        window.location.reload()
+      if (res.status === 201) {
+        router.push("/");
+        reset();
+        window.location.reload();
       }
     } catch (error) {
       console.error(error);
@@ -41,16 +52,23 @@ export default function CreatePost() {
         >
           <fieldset className='relative flex flex-col gap-2'>
             <label htmlFor='post' className='font-semibold uppercase'>
-              Content(não sei o que colocar aqui, to com sono)
+              Conte o que você está pensando
             </label>
             <textarea
               id='post'
-              aria-invalid={errors.content ? "true" : "false"}
               aria-describedby={errors.content ? "content-error" : undefined}
               placeholder='Manda um cuckoo aí'
               className='h-28 resize-none rounded-md border-b bg-transparent p-2 text-white outline-fuchsia-500 '
               {...register("content")}
+              onChange={handleInputChange}
             ></textarea>
+            <span
+              className={`text-sm absolute -bottom-6 left-3 ${
+                charCount >= 300 ? "text-red-500" : "text-gray-400"
+              }`}
+            >
+              {charCount}/300
+            </span>
             {errors.content && (
               <span
                 id='content-error'
