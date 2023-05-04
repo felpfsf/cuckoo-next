@@ -1,27 +1,33 @@
 import { useRouter } from "next/router";
 import { api } from "@/lib/axios";
-import { useForm } from "react-hook-form";
-import * as Dialog from "@radix-ui/react-dialog";
-import { AiOutlineClose, AiOutlineLoading3Quarters } from "react-icons/ai";
-import { useState } from "react";
 
-interface PostProps {
-  content: string;
-}
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { PostInputProps, postSchema } from "@/models/post.schemas";
+
+import * as Dialog from "@radix-ui/react-dialog";
+
+import { AiOutlineClose, AiOutlineLoading3Quarters } from "react-icons/ai";
+import { FiAlertCircle } from "react-icons/fi";
 
 export default function CreatePost() {
   const router = useRouter();
   const {
-    formState: { isSubmitting },
+    formState: { errors, isSubmitting },
     handleSubmit,
     register,
-  } = useForm<PostProps>();
+    reset
+  } = useForm<PostInputProps>({ resolver: zodResolver(postSchema) });
 
-  const submitPost = async (data: PostProps) => {
-    console.log(data);
+  const submitPost = async (data: PostInputProps) => {
+    // console.log(data);
     try {
-      await api.post("api/compose/post", data);
-      window.location.reload();
+      const res = await api.post("api/compose/post", data);
+      if(res.status === 201){
+        router.push('/')
+        reset()
+        window.location.reload()
+      }
     } catch (error) {
       console.error(error);
     }
@@ -33,17 +39,28 @@ export default function CreatePost() {
           className='mt-8 flex flex-col gap-8 p-4'
           onSubmit={handleSubmit(submitPost)}
         >
-          <fieldset className='flex flex-col gap-2'>
+          <fieldset className='relative flex flex-col gap-2'>
             <label htmlFor='post' className='font-semibold uppercase'>
               Content(não sei o que colocar aqui, to com sono)
             </label>
             <textarea
-              // name='post'
               id='post'
+              aria-invalid={errors.content ? "true" : "false"}
+              aria-describedby={errors.content ? "content-error" : undefined}
               placeholder='Manda um cuckoo aí'
-              className='h-28 resize-none rounded-md border-b bg-transparent p-2 text-white outline-fuchsia-500'
+              className='h-28 resize-none rounded-md border-b bg-transparent p-2 text-white outline-fuchsia-500 '
               {...register("content")}
             ></textarea>
+            {errors.content && (
+              <span
+                id='content-error'
+                role='alert'
+                className='absolute -bottom-6 right-3 flex items-center gap-2 self-end text-sm text-red-500'
+              >
+                <FiAlertCircle />
+                {errors.content?.message}
+              </span>
+            )}
           </fieldset>
           <button
             type='submit'
