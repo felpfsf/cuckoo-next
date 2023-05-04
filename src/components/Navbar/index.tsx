@@ -146,7 +146,6 @@ export default function Navbar() {
                 >
                   <FiLogIn size={26} />
                   <span className='hidden lg:block'>Entrar</span>
-
                 </Link>
               </li>
             </>
