@@ -16,7 +16,7 @@ interface FeedProps {
 function Home({ feed }: FeedProps) {
   return (
     <MainLayout pageTitle='Página Principal - Cuckoo'>
-      <h1 className='text-xl font-semibold'>Página Inicial</h1>
+      <h1 className='text-xl font-semibold pl-4'>Página Inicial</h1>
       <div className='flex flex-col'>
         {feed.map((post) => (
           <PostCard key={post.id} {...post} />
