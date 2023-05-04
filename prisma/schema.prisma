@@ -72,7 +72,7 @@ model Post {
   id        String    @id @default(cuid())
   content   String
   createdAt DateTime  @default(now())
-  updateAt  DateTime  @updatedAt
+  updatedAt DateTime  @updatedAt
   author    User?     @relation(fields: [authorId], references: [id])
   authorId  String?
   likes     Like[]
@@ -97,7 +97,7 @@ model Comment {
   id        String   @id @default(cuid())
   content   String
   createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
   post      Post     @relation(fields: [postId], references: [id])
   postId    String
   author    User     @relation(fields: [authorId], references: [id])
