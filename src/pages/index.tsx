@@ -35,6 +35,7 @@ export const getStaticProps: GetStaticProps = async () => {
         select: { name: true, email: true, image: true },
       },
     },
+    orderBy: { createdAt: "desc" },
   });
   return {
     props: { feed: JSON.parse(JSON.stringify(feed)) },
