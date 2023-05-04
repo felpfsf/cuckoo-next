@@ -1,9 +1,8 @@
+import { useState } from "react";
 import Image from "next/image";
-import Balancer from "react-wrap-balancer";
-import AvatarMockup from "../../assets/avatar_mockup.jpg";
 import { FaRegComment } from "react-icons/fa";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
-import { useState } from "react";
+import AvatarMockup from "../../assets/avatar_mockup.jpg";
 
 interface PostProps {
   id: string;
@@ -11,7 +10,7 @@ interface PostProps {
   author: { name: string; email: string; image: string };
 }
 
-export default function PostCard({ author, content, id }: PostProps) {
+export default function PostCard({ author, content}: PostProps) {
   const [like, setLike] = useState(false);
   const handleLike = () => {
     setLike((prev) => !prev);
@@ -30,6 +29,8 @@ export default function PostCard({ author, content, id }: PostProps) {
           <Image
             src={author.image ? author.image : AvatarMockup}
             alt='Avatar do usuário'
+            width={48}
+            height={48}
             className='h-full w-full object-cover'
           />
         </div>
