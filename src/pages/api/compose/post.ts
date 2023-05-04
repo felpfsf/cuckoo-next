@@ -20,11 +20,17 @@ export default async function handler(
   const session = await getServerSession(req, res, authOptions);
   console.log(session);
   if (!session) {
-    return res.status(500);
+    return res
+      .status(500)
+      .json({ message: "Usuário precisa estar autenticado" });
   }
-  const userEmail = session.user?.email!;
+  try {
+    const userEmail = session.user?.email!;
+    const result = await handleCreatePost(content, userEmail);
 
-  const result = await handleCreatePost(content, userEmail);
-
-  return res.status(201).json(result);
+    return res.status(201).json(result);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error });
+  }
 }
