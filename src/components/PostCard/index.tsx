@@ -32,7 +32,6 @@ export default function PostCard({
   const [showCommentField, setShowCommentField] = useState(false);
   const [isLike, setIsLiked] = useState(isLiked);
   const { data: session } = useSession();
-  console.log(commentCount);
 
   const handleLike = async (postId: string) => {
     try {
@@ -56,7 +55,7 @@ export default function PostCard({
 
   return (
     <article className='flex w-full items-start gap-4 border-t border-gray-800 px-4 py-2'>
-      <figure className='col-span-1 row-span-2 mt-2 flex w-12 flex-col items-center'>
+      <figure className='mt-2 flex w-12 flex-col items-center'>
         <div className='flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-fuchsia-900'>
           <Image
             src={author.image ? author.image : AvatarMockup}
@@ -67,20 +66,19 @@ export default function PostCard({
           />
         </div>
       </figure>
-      <main
-        id='content'
-        className='col-span-2 row-span-3 flex flex-col justify-between'
-      >
+      <main id='content' className='flex w-full flex-col justify-between'>
         <div id='user-name' className='pt-2'>
           <p className='break-words text-sm font-semibold'>{author.name}</p>
         </div>
-        <div id='post-content' className=''>
-          <p className='text-sm lg:text-base'>{content}</p>
+        <div id='post-content'>
+          <Link href={`post/${postId}`} aria-label='Link para acessar o post'>
+            <p className='text-sm lg:text-base'>{content}</p>
+          </Link>
         </div>
         <div id='post-actions' className='pt-4'>
           <nav role='navigation'>
             <ul className='flex gap-12'>
-              <li className=''>
+              <li>
                 <button
                   aria-label='Comentar'
                   className='flex items-center gap-2'
@@ -92,7 +90,7 @@ export default function PostCard({
                   {commentCount}
                 </button>
               </li>
-              <li className=''>
+              <li>
                 <button
                   aria-label='Curtir'
                   className='flex items-center gap-2'
