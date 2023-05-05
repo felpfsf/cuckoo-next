@@ -48,7 +48,7 @@ export default function CommentField({ onSubmit, postId }: CommentFieldProps) {
 
   return (
     <form
-      className='relative mt-2 flex flex-col gap-2'
+      className='relative mt-2 flex flex-col gap-2 max-w-md'
       onSubmit={handleSubmit(submitComment)}
     >
       <textarea

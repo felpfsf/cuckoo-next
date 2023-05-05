@@ -3,6 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Image from "next/image";
 import AvatarMockup from "../../assets/avatar_mockup_2.png";
+import {
+  BsArrowLeft,
+  BsArrowReturnLeft,
+  BsArrowLeftShort,
+} from "react-icons/bs";
+import Link from "next/link";
 
 interface Like {
   postId: string;
@@ -23,10 +29,15 @@ interface PostProps {
 }
 
 export default function Post({ post }: { post: PostProps }) {
-  console.log(post);
   return (
-    <MainLayout pageTitle={"Post"}>
+    <MainLayout pageTitle={`Post de ${post.author.name} | Cuckoo`}>
       <div className='p-4'>
+        <div className='mb-8'>
+          <Link href={"/"} className='flex items-center group gap-4'>
+            <BsArrowLeftShort size={32} />
+            <span className='text-xl font-semibold group-hover:border-b border-b-fuchsia-200'>Retornar</span>
+          </Link>
+        </div>
         <div>
           <figure className='flex gap-3'>
             <div className='flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-fuchsia-900'>
@@ -47,7 +58,7 @@ export default function Post({ post }: { post: PostProps }) {
           <div id='post-content' className='mt-4'>
             <p className='text-sm'>{post.content}</p>
           </div>
-          <p className='text-sm text-gray-600 mt-4'>Horário etc...</p>
+          <p className='mt-4 text-sm text-gray-600'>Horário etc...</p>
         </div>
         <div className='mt-8'>
           <strong>Comentários:</strong>

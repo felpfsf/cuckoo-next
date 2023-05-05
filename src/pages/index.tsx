@@ -33,19 +33,21 @@ interface FeedProps {
 function Home({ feed, likedPostIds }: FeedProps) {
   return (
     <MainLayout pageTitle='Página Principal - Cuckoo'>
-      <h1 className='pl-4 text-xl font-semibold'>Página Inicial</h1>
-      <div className='flex flex-col'>
-        {feed.map((post) => {
-          return (
-            <PostCard
-            key={post.id}
-            isLiked={likedPostIds.includes(post.id)}
-            likeCount={post.likes.length}
-            commentCount={post.comments.length}
-            {...post}
-          />
-          );
-        })}
+      <h1 className='px-4 py-2 text-xl font-semibold'>Página Inicial</h1>
+      <div className=''>
+        <div className='flex flex-col'>
+          {feed.map((post) => {
+            return (
+              <PostCard
+                key={post.id}
+                isLiked={likedPostIds.includes(post.id)}
+                likeCount={post.likes.length}
+                commentCount={post.comments.length}
+                {...post}
+              />
+            );
+          })}
+        </div>
       </div>
     </MainLayout>
   );
