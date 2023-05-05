@@ -8,22 +8,31 @@ import { FaRegComment } from "react-icons/fa";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import AvatarMockup from "../../assets/avatar_mockup_2.png";
 
-interface PostProps {
+interface PostCardProps {
   id: string;
+  author: {
+    name: string;
+    email: string;
+    image: string;
+  };
   content: string;
-  author: { name: string; email: string; image: string };
+  isLiked: boolean;
+  likeCount: number;
+  commentCount: number;
 }
 
 export default function PostCard({
   author,
+  commentCount,
   content,
-  id: postId,
   isLiked,
   likeCount,
-}: PostProps & { isLiked: boolean; likeCount: number }) {
+  id: postId,
+}: PostCardProps) {
   const [showCommentField, setShowCommentField] = useState(false);
   const [isLike, setIsLiked] = useState(isLiked);
   const { data: session } = useSession();
+  console.log(commentCount);
 
   const handleLike = async (postId: string) => {
     try {
@@ -79,7 +88,8 @@ export default function PostCard({
                   onClick={handleCommentSubmit}
                 >
                   <FaRegComment />
-                  Comentar
+                  {/* Comentar */}
+                  {commentCount}
                 </button>
               </li>
               <li className=''>

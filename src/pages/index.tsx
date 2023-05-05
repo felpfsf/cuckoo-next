@@ -4,8 +4,17 @@ import MainLayout from "@/components/MainLayout";
 import PostCard from "@/components/PostCard";
 import { getSession } from "next-auth/react";
 
-interface Like{
-  postId:string
+interface Like {
+  postId: string;
+}
+
+interface Comment {
+  id: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  postId: string;
+  authorId: string;
 }
 
 interface PostProps {
@@ -13,6 +22,7 @@ interface PostProps {
   content: string;
   author: { name: string; email: string; image: string };
   likes: Like[];
+  comments: Comment[];
 }
 
 interface FeedProps {
@@ -28,11 +38,12 @@ function Home({ feed, likedPostIds }: FeedProps) {
         {feed.map((post) => {
           return (
             <PostCard
-              key={post.id}
-              isLiked={likedPostIds.includes(post.id)}
-              likeCount={post.likes.length}
-              {...post}
-            />
+            key={post.id}
+            isLiked={likedPostIds.includes(post.id)}
+            likeCount={post.likes.length}
+            commentCount={post.comments.length}
+            {...post}
+          />
           );
         })}
       </div>
@@ -51,6 +62,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         select: { name: true, email: true, image: true },
       },
       likes: true,
+      comments: true,
     },
     orderBy: { createdAt: "desc" },
   });
@@ -62,7 +74,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         select: { postId: true },
       })
     : [];
-  console.log(likedPosts);
   const likedPostIds = likedPosts.map((like) => like.postId);
   return {
     props: {
