@@ -5,6 +5,7 @@ import { FaRegComment } from "react-icons/fa";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import AvatarMockup from "../../assets/avatar_mockup_2.png";
 import { api } from "@/lib/axios";
+import { useSession } from "next-auth/react";
 
 interface PostProps {
   id: string;
@@ -17,12 +18,14 @@ export default function PostCard({
   content,
   id: postId,
   isLiked,
-}: PostProps & { isLiked: boolean }) {
-  const [like, setLike] = useState(isLiked);
+  likeCount,
+}: PostProps & { isLiked: boolean; likeCount: number }) {
+  const { data: session } = useSession();
+  const [isLike, setIsLiked] = useState(isLiked);
 
   const handleLike = async (postId: string) => {
     try {
-      setLike((prev) => !prev);
+      setIsLiked((prev) => !prev);
       const response = await api.post("/api/post/like", { postId });
       const { message, like } = response.data;
       if (like) {
@@ -76,9 +79,11 @@ export default function PostCard({
                   aria-label='Curtir'
                   className='flex items-center gap-2'
                   onClick={() => handleLike(postId)}
+                  disabled={!session}
                 >
-                  {like ? <AiFillHeart /> : <AiOutlineHeart />}
-                  Like
+                  {isLike ? <AiFillHeart /> : <AiOutlineHeart />}
+                  {/* Like */}
+                  {likeCount}
                 </button>
               </li>
               <li>
