@@ -1,14 +1,15 @@
-import MainLayout from "@/components/MainLayout";
-import { prisma } from "@/lib/prisma";
-import { GetStaticPaths, GetStaticProps } from "next";
-import Image from "next/image";
-import AvatarMockup from "../../assets/avatar_mockup_2.png";
-import {
-  BsArrowLeft,
-  BsArrowReturnLeft,
-  BsArrowLeftShort,
-} from "react-icons/bs";
+import { useState } from "react";
+import type { GetServerSideProps } from "next";
 import Link from "next/link";
+import Image from "next/image";
+import { getSession, useSession } from "next-auth/react";
+import { api } from "@/lib/axios";
+import { prisma } from "@/lib/prisma";
+import MainLayout from "@/components/MainLayout";
+import { BsArrowLeftShort } from "react-icons/bs";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import AvatarMockup from "../../assets/avatar_mockup_2.png";
+import { FaRegComment } from "react-icons/fa";
 
 interface Like {
   postId: string;
@@ -28,14 +29,41 @@ interface PostProps {
   comments: Comment[];
 }
 
-export default function Post({ post }: { post: PostProps }) {
+interface Props {
+  post: PostProps;
+  likedPostIds: string[];
+}
+
+export default function Post({ likedPostIds, post }: Props) {
+  const { data: session } = useSession();
+  const isLiked = likedPostIds.includes(post.id);
+  const [isLike, setIsLiked] = useState(isLiked);
+
+  const handleLike = async (postId: string) => {
+    try {
+      setIsLiked((prev) => !prev);
+      const response = await api.post("/api/post/like", { postId });
+      const { message, like } = response.data;
+      if (like) {
+        console.log(message, like);
+      } else {
+        console.log(message);
+      }
+    } catch (error) {
+      console.error(error);
+      return "Ocorrreu um erro ao adicionar sua curtida";
+    }
+  };
+
   return (
-    <MainLayout pageTitle={`Post de ${post.author.name} | Cuckoo`}>
+    <MainLayout pageTitle={`Post de  | Cuckoo`}>
       <div className='p-4'>
         <div className='mb-8'>
-          <Link href={"/"} className='flex items-center group gap-4'>
+          <Link href={"/"} className='group flex items-center gap-4'>
             <BsArrowLeftShort size={32} />
-            <span className='text-xl font-semibold group-hover:border-b border-b-fuchsia-200'>Retornar</span>
+            <span className='border-b-fuchsia-200 text-xl font-semibold group-hover:border-b'>
+              Retornar
+            </span>
           </Link>
         </div>
         <div>
@@ -58,7 +86,30 @@ export default function Post({ post }: { post: PostProps }) {
           <div id='post-content' className='mt-4'>
             <p className='text-sm'>{post.content}</p>
           </div>
-          <p className='mt-4 text-sm text-gray-600'>Horário etc...</p>
+          <div className='mt-4'>
+            <ul className='flex items-center gap-4'>
+              <li>
+                <p className='text-sm text-gray-600'>Horário etc...</p>
+              </li>
+              <li>
+                <p className='flex items-center gap-2 text-sm text-gray-600'>
+                  <FaRegComment />
+                  {post.comments.length}
+                </p>
+              </li>
+              <li>
+                <button
+                  aria-label='Curtir'
+                  className='flex items-center gap-2'
+                  disabled={!session}
+                  onClick={() => handleLike(post.id)}
+                >
+                  {isLike ? <AiFillHeart /> : <AiOutlineHeart />}
+                  {post.likes.length}
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
         <div className='mt-8'>
           <strong>Comentários:</strong>
@@ -91,17 +142,21 @@ export default function Post({ post }: { post: PostProps }) {
   );
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  return {
-    paths: [],
-    fallback: "blocking",
-  };
-};
+// export const getStaticPaths: GetStaticPaths = async () => {
+//   return {
+//     paths: [],
+//     fallback: "blocking",
+//   };
+// };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  console.log(params?.id);
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  console.log(context?.query);
+  const { id } = context.query;
+  const session = await getSession(context);
+  const currentUserId = session?.user.id;
+
   const post = await prisma.post.findUnique({
-    where: { id: String(params?.id) },
+    where: { id: id as string },
     include: {
       author: {
         select: { name: true, image: true },
@@ -115,11 +170,23 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
           id: true,
         },
       },
+      likes: true,
     },
   });
+  console.log(post);
+  const likedPosts = currentUserId
+    ? await prisma.like.findMany({
+        where: {
+          userId: currentUserId,
+        },
+        select: { postId: true },
+      })
+    : [];
+  const likedPostIds = likedPosts.map((like) => like.postId);
   return {
     props: {
       post: JSON.parse(JSON.stringify(post)),
+      likedPostIds,
     },
   };
 };
