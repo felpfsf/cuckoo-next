@@ -4,16 +4,20 @@ import MainLayout from "@/components/MainLayout";
 import PostCard from "@/components/PostCard";
 import { getSession } from "next-auth/react";
 
+interface Like{
+  postId:string
+}
+
 interface PostProps {
   id: string;
   content: string;
   author: { name: string; email: string; image: string };
-  likes: [];
+  likes: Like[];
 }
 
 interface FeedProps {
   feed: PostProps[];
-  likedPostIds: any;
+  likedPostIds: string[];
 }
 
 function Home({ feed, likedPostIds }: FeedProps) {
@@ -22,7 +26,6 @@ function Home({ feed, likedPostIds }: FeedProps) {
       <h1 className='pl-4 text-xl font-semibold'>Página Inicial</h1>
       <div className='flex flex-col'>
         {feed.map((post) => {
-          console.log(post.likes.length);
           return (
             <PostCard
               key={post.id}
