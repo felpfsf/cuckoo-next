@@ -4,6 +4,7 @@ import Image from "next/image";
 import { FaRegComment } from "react-icons/fa";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import AvatarMockup from "../../assets/avatar_mockup_2.png";
+import { api } from "@/lib/axios";
 
 interface PostProps {
   id: string;
@@ -11,10 +12,13 @@ interface PostProps {
   author: { name: string; email: string; image: string };
 }
 
-export default function PostCard({ author, content, id }: PostProps) {
+export default function PostCard({ author, content, id: postId }: PostProps) {
   const [like, setLike] = useState(false);
-  const handleLike = () => {
+  const handleLike = async (postId: string) => {
+    console.log(postId)
     setLike((prev) => !prev);
+    const res = await api.post("api/post/like", {postId});
+    return res;
   };
 
   //   <div class="grid grid-rows-3 grid-flow-col gap-4">
@@ -67,14 +71,19 @@ export default function PostCard({ author, content, id }: PostProps) {
                 <button
                   aria-label='Curtir'
                   className='flex items-center gap-2'
-                  onClick={handleLike}
+                  onClick={() => handleLike(postId)}
                 >
                   {like ? <AiFillHeart /> : <AiOutlineHeart />}
                   Like
                 </button>
               </li>
               <li>
-                <Link href={`post/${id}`} aria-label="Link para acessar o post">Acessar o post</Link>
+                <Link
+                  href={`post/${postId}`}
+                  aria-label='Link para acessar o post'
+                >
+                  Acessar o post
+                </Link>
               </li>
             </ul>
           </nav>
