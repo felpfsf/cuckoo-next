@@ -21,9 +21,9 @@ export default function MainLayout({ children, pageTitle }: LayoutProps) {
       </>
       <main className='relative mx-auto flex max-w-screen-xl'>
         <Navbar />
-        <Footer />
+
         <motion.section
-          className='flex min-h-screen w-full max-w-[864px] flex-col gap-4 border-r border-gray-800 sm:ml-20 lg:ml-[220px] lg:py-6 lg:pl-3 pb-20'
+          className='flex min-h-screen w-full max-w-[864px] flex-col gap-4 border-r border-gray-800 pb-20 sm:ml-20 lg:ml-[220px] lg:py-6 lg:pl-3'
           initial={{ x: 300, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: 300, opacity: 0 }}
@@ -35,6 +35,7 @@ export default function MainLayout({ children, pageTitle }: LayoutProps) {
         >
           {children}
         </motion.section>
+        <Footer />
         {/* <aside className='hidden max-w-[288px] flex-1 border-l border-gray-800 lg:block'></aside> */}
       </main>
     </>
