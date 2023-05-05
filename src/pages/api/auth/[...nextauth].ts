@@ -85,7 +85,6 @@ export const authOptions: AuthOptions = {
       if (user) {
         token.uid = user.id;
       }
-      console.log(token);
       return token;
     },
   },
