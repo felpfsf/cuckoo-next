@@ -1,11 +1,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { api } from "@/lib/axios";
+import CommentField from "../CommentField";
 import { FaRegComment } from "react-icons/fa";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import AvatarMockup from "../../assets/avatar_mockup_2.png";
-import { api } from "@/lib/axios";
-import { useSession } from "next-auth/react";
 
 interface PostProps {
   id: string;
@@ -20,8 +21,9 @@ export default function PostCard({
   isLiked,
   likeCount,
 }: PostProps & { isLiked: boolean; likeCount: number }) {
-  const { data: session } = useSession();
+  const [showCommentField, setShowCommentField] = useState(false);
   const [isLike, setIsLiked] = useState(isLiked);
+  const { data: session } = useSession();
 
   const handleLike = async (postId: string) => {
     try {
@@ -37,6 +39,10 @@ export default function PostCard({
       console.error(error);
       return "Ocorrreu um erro ao adicionar sua curtida";
     }
+  };
+
+  const handleCommentSubmit = () => {
+    setShowCommentField((prev) => !prev);
   };
 
   return (
@@ -69,6 +75,8 @@ export default function PostCard({
                 <button
                   aria-label='Comentar'
                   className='flex items-center gap-2'
+                  disabled={!session}
+                  onClick={handleCommentSubmit}
                 >
                   <FaRegComment />
                   Comentar
@@ -78,8 +86,8 @@ export default function PostCard({
                 <button
                   aria-label='Curtir'
                   className='flex items-center gap-2'
-                  onClick={() => handleLike(postId)}
                   disabled={!session}
+                  onClick={() => handleLike(postId)}
                 >
                   {isLike ? <AiFillHeart /> : <AiOutlineHeart />}
                   {/* Like */}
@@ -91,11 +99,14 @@ export default function PostCard({
                   href={`post/${postId}`}
                   aria-label='Link para acessar o post'
                 >
-                  Acessar o post
+                  Acessar
                 </Link>
               </li>
             </ul>
           </nav>
+          {showCommentField && (
+            <CommentField postId={postId} onSubmit={handleCommentSubmit} />
+          )}
         </div>
       </main>
     </article>
