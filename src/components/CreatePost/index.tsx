@@ -33,7 +33,7 @@ export default function CreatePost() {
   const submitPost = async (data: PostInputProps) => {
     // console.log(data);
     try {
-      const res = await api.post("api/compose/post", data);
+      const res = await api.post("api/post/create", data);
       if (res.status === 201) {
         router.push("/");
         reset();
