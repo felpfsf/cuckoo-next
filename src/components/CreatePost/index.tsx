@@ -63,7 +63,7 @@ export default function CreatePost() {
               onChange={handleInputChange}
             ></textarea>
             <span
-              className={`text-sm absolute -bottom-6 left-3 ${
+              className={`absolute -bottom-6 left-3 text-sm ${
                 charCount >= 300 ? "text-red-500" : "text-gray-400"
               }`}
             >
