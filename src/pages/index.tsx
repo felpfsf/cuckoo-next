@@ -11,15 +11,20 @@ interface PostProps {
 
 interface FeedProps {
   feed: PostProps[];
+  likedPostIds: any;
 }
 
-function Home({ feed }: FeedProps) {
+function Home({ feed, likedPostIds }: FeedProps) {
   return (
     <MainLayout pageTitle='Página Principal - Cuckoo'>
-      <h1 className='text-xl font-semibold pl-4'>Página Inicial</h1>
+      <h1 className='pl-4 text-xl font-semibold'>Página Inicial</h1>
       <div className='flex flex-col'>
         {feed.map((post) => (
-          <PostCard key={post.id} {...post} />
+          <PostCard
+            key={post.id}
+            isLiked={likedPostIds.includes(post.id)}
+            {...post}
+          />
         ))}
       </div>
     </MainLayout>
@@ -37,8 +42,14 @@ export const getStaticProps: GetStaticProps = async () => {
     },
     orderBy: { createdAt: "desc" },
   });
+  const likedPosts = await prisma.like.findMany({ select: { postId: true } });
+  console.log(likedPosts);
+  const likedPostIds = likedPosts.map((like) => like.postId);
   return {
-    props: { feed: JSON.parse(JSON.stringify(feed)) },
+    props: {
+      feed: JSON.parse(JSON.stringify(feed)),
+      likedPostIds,
+    },
     revalidate: 10,
   };
 };
