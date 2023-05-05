@@ -4,36 +4,51 @@ import { authOptions } from "../auth/[...nextauth]";
 import { prisma } from "@/lib/prisma";
 
 const handleLike = async (postId: string, userId: string) => {
-  const like = await prisma.like.create({
-    data: {
-      post: {
-        connect: { id: postId },
-      },
-      user: {
-        connect: { id: userId },
-      },
+  const like = await prisma.like.findUnique({
+    where: {
+      postId_userId: { postId, userId },
     },
   });
-  console.log(like)
+  if (like) {
+    await prisma.like.delete({
+      where: {
+        id: like.id,
+      },
+    });
+    return null;
+  } else {
+    const newLike = await prisma.like.create({
+      data: {
+        post: {
+          connect: { id: postId },
+        },
+        user: {
+          connect: { id: userId },
+        },
+      },
+    });
+    return newLike;
+  }
 };
-
-type Data={
-  postId:string
-}
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { postId } = req.body;
   const session = await getServerSession(req, res, authOptions);
   if (!session) {
     return res
       .status(500)
       .json({ message: "Usuário precisa estar autenticado" });
   }
-  const userId = session.user.id;
-  console.log(session.user.id);
-  const like = handleLike(postId, userId)
-  // console.log(like);
+  const { postId } = req.body;
+  const userId = session.user?.id;
+  const like = await handleLike(postId, userId);
+
+  if (!like) {
+    return res.status(200).json({ message: "Curtida removida com sucesso" });
+  }
+  return res
+    .status(200)
+    .json({ message: "Curtida adicionada com sucesso", like });
 }
