@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]";
 import { prisma } from "@/lib/prisma";
+import { authOptions } from "../auth/[...nextauth]";
 
 const handleCreatePost = async (content: string, userEmail: string) => {
   return await prisma.post.create({
@@ -16,18 +16,18 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { content } = req.body;
   const session = await getServerSession(req, res, authOptions);
-  console.log(session);
   if (!session) {
     return res
-      .status(500)
+      .status(401)
       .json({ message: "Usuário precisa estar autenticado" });
   }
-  try {
-    const userEmail = session.user?.email!;
-    const result = await handleCreatePost(content, userEmail);
 
+  const userEmail = session.user?.email!;
+  const { content } = req.body;
+
+  try {
+    const result = await handleCreatePost(content, userEmail);
     return res.status(201).json(result);
   } catch (error) {
     console.error(error);
