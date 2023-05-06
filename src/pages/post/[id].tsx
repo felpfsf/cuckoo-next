@@ -42,12 +42,16 @@ export default function Post({ likedPostIds, post }: Props) {
   const { data: session } = useSession();
   const isLiked = likedPostIds.includes(post.id);
   const [isLike, setIsLiked] = useState(isLiked);
-  const createdAt = new Date(post.createdAt);
-  const formattedDate = `${format(createdAt, "HH:mm")} - ${format(
-    createdAt,
-    "dd MMM yy",
-    { locale: ptBR }
-  )}`;
+
+  const formatDate = (date: string) => {
+    const newDate = new Date(date);
+    const formattedDate = `${format(newDate, "HH:mm")} - ${format(
+      newDate,
+      "dd MMM yy",
+      { locale: ptBR }
+    )}`;
+    return formattedDate;
+  };
 
   const handleLike = async (postId: string) => {
     try {
@@ -99,7 +103,9 @@ export default function Post({ likedPostIds, post }: Props) {
           <div className='mt-4'>
             <ul className='flex items-center gap-4'>
               <li>
-                <p className='text-sm text-gray-600'>{formattedDate}</p>
+                <p className='text-sm text-gray-600'>
+                  {formatDate(post.createdAt)}
+                </p>
               </li>
               <li>
                 <p className='flex items-center gap-2 text-sm text-gray-600'>
@@ -139,10 +145,12 @@ export default function Post({ likedPostIds, post }: Props) {
                   className='h-full w-full object-cover'
                 />
               </div>
-              <div>
+              <div className="flex flex-col gap-2">
                 <p className='text-sm font-semibold'>{comment.author.name}</p>
                 <p className='text-sm'>{comment.content}</p>
-                <p className='text-sm text-gray-600'>Horário etc...</p>
+                <p className='text-sm text-gray-600'>
+                  {formatDate(comment.createdAt)}
+                </p>
               </div>
             </div>
           ))}
@@ -178,7 +186,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             select: { name: true, image: true },
           },
           id: true,
+          createdAt: true,
         },
+        orderBy: { createdAt: "desc" },
       },
       likes: true,
     },
