@@ -1,6 +1,6 @@
 # Cuckoo
 
-O Cuckoo é uma rede social similar ao Twitter, onde os usuários podem postar, comentar e curtir os posts de outros usuários. Os usuários também podem seguir outros usuários e receber atualizações em seu feed de notícias.
+O Cuckoo é uma rede social similar ao Twitter, onde os usuários podem postar, comentar e curtir os posts e também podem seguir outros usuários e receber atualizações em seu feed de notícias.
 
 ## Tecnologias Utilizadas
 
