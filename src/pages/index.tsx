@@ -9,20 +9,20 @@ interface Like {
 }
 
 interface Comment {
-  id: string;
+  authorId: string;
   content: string;
   createdAt: string;
-  updatedAt: string;
+  id: string;
   postId: string;
-  authorId: string;
 }
 
 interface PostProps {
-  id: string;
-  content: string;
   author: { name: string; email: string; image: string };
-  likes: Like[];
   comments: Comment[];
+  content: string;
+  createdAt: string;
+  id: string;
+  likes: Like[];
 }
 
 interface FeedProps {
