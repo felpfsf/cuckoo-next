@@ -2,6 +2,8 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+import { format, formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { api } from "@/lib/axios";
 import CommentField from "../CommentField";
 import { FaRegComment } from "react-icons/fa";
@@ -16,6 +18,7 @@ interface PostCardProps {
     image: string;
   };
   content: string;
+  createdAt: string;
   isLiked: boolean;
   likeCount: number;
   commentCount: number;
@@ -25,6 +28,7 @@ export default function PostCard({
   author,
   commentCount,
   content,
+  createdAt,
   isLiked,
   likeCount,
   id: postId,
@@ -32,6 +36,7 @@ export default function PostCard({
   const [showCommentField, setShowCommentField] = useState(false);
   const [isLike, setIsLiked] = useState(isLiked);
   const { data: session } = useSession();
+  console.log(createdAt);
 
   const handleLike = async (postId: string) => {
     try {
@@ -48,6 +53,26 @@ export default function PostCard({
       return "Ocorrreu um erro ao adicionar sua curtida";
     }
   };
+
+  const createdAtDate = new Date(createdAt);
+  const distance = formatDistanceToNow(createdAtDate, { locale: ptBR });
+  console.log(distance);
+  let formattedDate;
+  if (distance.startsWith("cerca de")) {
+    const newDistance = distance.replace("cerca de", "").trim();
+    formattedDate = `${newDistance}`;
+  } else if (
+    createdAtDate.getTime() <
+    new Date().getTime() - 24 * 60 * 60 * 1000
+  ) {
+    formattedDate = `${format(createdAtDate, "d 'de' MMM", { locale: ptBR })}`;
+  } else {
+    const daysMatch = distance.match(/\d+/);
+    const daysAgo = daysMatch ? parseInt(daysMatch[0], 10) : 0;
+    formattedDate = `${daysAgo}d`;
+  }
+
+  console.log(formattedDate);
 
   const handleCommentSubmit = () => {
     setShowCommentField((prev) => !prev);
@@ -66,7 +91,7 @@ export default function PostCard({
           />
         </div>
       </figure>
-      <main id='content' className='flex w-full flex-col justify-between'>
+      <main id='content' className='flex w-full flex-col justify-between relative'>
         <div id='user-name' className='pt-2'>
           <p className='break-words text-sm font-semibold'>{author.name}</p>
         </div>
@@ -75,6 +100,7 @@ export default function PostCard({
             <p className='text-sm lg:text-base'>{content}</p>
           </Link>
         </div>
+        <span className='text-xs text-gray-400 absolute right-0'>{formattedDate}</span>
         <div id='post-actions' className='pt-4'>
           <nav role='navigation'>
             <ul className='flex gap-12'>

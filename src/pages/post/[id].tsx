@@ -3,6 +3,8 @@ import type { GetServerSideProps } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { getSession, useSession } from "next-auth/react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { api } from "@/lib/axios";
 import { prisma } from "@/lib/prisma";
 import MainLayout from "@/components/MainLayout";
@@ -18,26 +20,34 @@ interface Like {
 interface Comment {
   author: { name: string; image: string };
   content: string;
+  createdAt: string;
   id: string;
 }
 
 interface PostProps {
-  id: string;
-  content: string;
   author: { name: string; image: string };
-  likes: Like[];
   comments: Comment[];
+  content: string;
+  createdAt: string;
+  id: string;
+  likes: Like[];
 }
 
 interface Props {
-  post: PostProps;
   likedPostIds: string[];
+  post: PostProps;
 }
 
 export default function Post({ likedPostIds, post }: Props) {
   const { data: session } = useSession();
   const isLiked = likedPostIds.includes(post.id);
   const [isLike, setIsLiked] = useState(isLiked);
+  const createdAt = new Date(post.createdAt);
+  const formattedDate = `${format(createdAt, "HH:mm")} - ${format(
+    createdAt,
+    "dd MMM yy",
+    { locale: ptBR }
+  )}`;
 
   const handleLike = async (postId: string) => {
     try {
@@ -89,7 +99,7 @@ export default function Post({ likedPostIds, post }: Props) {
           <div className='mt-4'>
             <ul className='flex items-center gap-4'>
               <li>
-                <p className='text-sm text-gray-600'>Horário etc...</p>
+                <p className='text-sm text-gray-600'>{formattedDate}</p>
               </li>
               <li>
                 <p className='flex items-center gap-2 text-sm text-gray-600'>
