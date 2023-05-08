@@ -5,6 +5,8 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { FaHome, FaUser, FaUsers } from "react-icons/fa";
 import { FiLogIn, FiLogOut } from "react-icons/fi";
 import { ImPencil2 } from "react-icons/im";
+import Image from "next/image";
+import AvatarMockup from "../../assets/avatar_mockup_2.png";
 
 export default function Footer() {
   const { data: session } = useSession();
@@ -25,7 +27,29 @@ export default function Footer() {
                   aria-label='Link para o painel de controle'
                   tabIndex={2}
                 >
-                  <FaUser size={26} />
+                  {/* <FaUser size={26} /> */}
+                  <figure className='flex w-full items-center gap-2'>
+                    <div className='flex h-7 items-center justify-center overflow-hidden rounded-full border-2 bg-fuchsia-900 lg:h-16 lg:w-16'>
+                      <Image
+                        src={
+                          session?.user.image
+                            ? session.user.image
+                            : AvatarMockup
+                        }
+                        alt={`Foto do perfil de ${session.user.name}`}
+                        width={64}
+                        height={64}
+                        className='h-full w-full object-cover'
+                      />
+                    </div>
+                    <figcaption>
+                      <div id='user-name' className='hidden'>
+                        <p className='text-sm font-semibold'>
+                          {session?.user.name}
+                        </p>
+                      </div>
+                    </figcaption>
+                  </figure>
                 </Link>
               </li>
               <li>
