@@ -56,6 +56,8 @@ model User {
   sessions      Session[]
   Like          Like[]
   Comment       Comment[]
+  followers     Follows[] @relation("following")
+  following     Follows[] @relation("follower")
 }
 
 model VerificationToken {
@@ -102,4 +104,14 @@ model Comment {
   postId    String
   author    User     @relation(fields: [authorId], references: [id])
   authorId  String
+}
+
+model Follows {
+  follower    User     @relation("follower", fields: [followerId], references: [id])
+  followerId  String
+  following   User     @relation("following", fields: [followingId], references: [id])
+  followingId String
+  createdAt   DateTime @default(now())
+
+  @@id([followerId, followingId])
 }
