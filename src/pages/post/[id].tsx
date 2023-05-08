@@ -3,10 +3,9 @@ import type { GetServerSideProps } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { getSession, useSession } from "next-auth/react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { api } from "@/lib/axios";
 import { prisma } from "@/lib/prisma";
+import { formatFullDate } from "@/utils/formatDate";
 import MainLayout from "@/components/MainLayout";
 import { BsArrowLeftShort } from "react-icons/bs";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
@@ -42,16 +41,6 @@ export default function Post({ likedPostIds, post }: Props) {
   const { data: session } = useSession();
   const isLiked = likedPostIds.includes(post.id);
   const [isLike, setIsLiked] = useState(isLiked);
-
-  const formatDate = (date: string) => {
-    const newDate = new Date(date);
-    const formattedDate = `${format(newDate, "HH:mm")} - ${format(
-      newDate,
-      "dd MMM yy",
-      { locale: ptBR }
-    )}`;
-    return formattedDate;
-  };
 
   const handleLike = async (postId: string) => {
     try {
@@ -104,7 +93,7 @@ export default function Post({ likedPostIds, post }: Props) {
             <ul className='flex items-center gap-4'>
               <li>
                 <p className='text-sm text-gray-600'>
-                  {formatDate(post.createdAt)}
+                  {formatFullDate(post.createdAt)}
                 </p>
               </li>
               <li>
@@ -149,7 +138,7 @@ export default function Post({ likedPostIds, post }: Props) {
                 <p className='text-sm font-semibold'>{comment.author.name}</p>
                 <p className='text-sm'>{comment.content}</p>
                 <p className='text-sm text-gray-600'>
-                  {formatDate(comment.createdAt)}
+                  {formatFullDate(comment.createdAt)}
                 </p>
               </div>
             </div>

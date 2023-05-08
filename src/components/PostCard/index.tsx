@@ -2,9 +2,8 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
-import { format, formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { api } from "@/lib/axios";
+import { formatDateDistance } from "@/utils/formatDate";
 import CommentField from "../CommentField";
 import { FaRegComment } from "react-icons/fa";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
@@ -37,7 +36,6 @@ export default function PostCard({
   const [showCommentField, setShowCommentField] = useState(false);
   const [isLike, setIsLiked] = useState(isLiked);
   const { data: session } = useSession();
-  console.log(createdAt);
 
   const handleLike = async (postId: string) => {
     try {
@@ -55,26 +53,6 @@ export default function PostCard({
     }
   };
 
-  const formatDate = (date: string) => {
-    const newDate = new Date(date);
-    const distance = formatDistanceToNow(newDate, { locale: ptBR });
-
-    let formattedDate;
-    if (distance.startsWith("cerca de")) {
-      const newDistance = distance.replace("cerca de", "").trim();
-      formattedDate = `${newDistance}`;
-    } else if (distance.includes("minuto")) {
-      const minutesMatch = distance.match(/\d+/);
-      const minutesAgo = minutesMatch ? parseInt(minutesMatch[0], 10) : 0;
-      formattedDate = `${minutesAgo} min`;
-    } else {
-      formattedDate = `${format(newDate, "d 'de' MMM", {
-        locale: ptBR,
-      })}`;
-    }
-    return formattedDate;
-  };
-
   const handleCommentSubmit = () => {
     setShowCommentField((prev) => !prev);
   };
@@ -82,7 +60,7 @@ export default function PostCard({
   return (
     <article className='flex w-full items-start gap-4 border-t border-gray-800 px-4 py-2'>
       <figure className='mt-2 flex w-12 flex-col items-center'>
-        <Link href={`users/${author.id}`}>
+        <Link href={`/users/${author.id}`}>
           <div className='flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-fuchsia-900'>
             <Image
               src={author.image ? author.image : AvatarMockup}
@@ -102,12 +80,12 @@ export default function PostCard({
           <p className='break-words text-sm font-semibold'>{author.name}</p>
         </div>
         <div id='post-content'>
-          <Link href={`post/${postId}`} aria-label='Link para acessar o post'>
+          <Link href={`/post/${postId}`} aria-label='Link para acessar o post'>
             <p className='text-sm lg:text-base'>{content}</p>
           </Link>
         </div>
         <span className='absolute right-0 text-xs text-gray-400'>
-          {formatDate(createdAt)}
+          {formatDateDistance(createdAt)}
         </span>
         <div id='post-actions' className='pt-4'>
           <nav role='navigation'>
@@ -135,14 +113,6 @@ export default function PostCard({
                   {/* Like */}
                   {likeCount}
                 </button>
-              </li>
-              <li>
-                <Link
-                  href={`post/${postId}`}
-                  aria-label='Link para acessar o post'
-                >
-                  Acessar
-                </Link>
               </li>
             </ul>
           </nav>
