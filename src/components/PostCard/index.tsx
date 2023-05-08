@@ -15,6 +15,7 @@ interface PostCardProps {
   author: {
     name: string;
     email: string;
+    id: string;
     image: string;
   };
   content: string;
@@ -54,25 +55,25 @@ export default function PostCard({
     }
   };
 
-  const createdAtDate = new Date(createdAt);
-  const distance = formatDistanceToNow(createdAtDate, { locale: ptBR });
-  console.log(distance);
-  let formattedDate;
-  if (distance.startsWith("cerca de")) {
-    const newDistance = distance.replace("cerca de", "").trim();
-    formattedDate = `${newDistance}`;
-  } else if (
-    createdAtDate.getTime() <
-    new Date().getTime() - 24 * 60 * 60 * 1000
-  ) {
-    formattedDate = `${format(createdAtDate, "d 'de' MMM", { locale: ptBR })}`;
-  } else {
-    const daysMatch = distance.match(/\d+/);
-    const daysAgo = daysMatch ? parseInt(daysMatch[0], 10) : 0;
-    formattedDate = `${daysAgo}d`;
-  }
+  const formatDate = (date: string) => {
+    const newDate = new Date(date);
+    const distance = formatDistanceToNow(newDate, { locale: ptBR });
 
-  console.log(formattedDate);
+    let formattedDate;
+    if (distance.startsWith("cerca de")) {
+      const newDistance = distance.replace("cerca de", "").trim();
+      formattedDate = `${newDistance}`;
+    } else if (distance.includes("minuto")) {
+      const minutesMatch = distance.match(/\d+/);
+      const minutesAgo = minutesMatch ? parseInt(minutesMatch[0], 10) : 0;
+      formattedDate = `${minutesAgo} min`;
+    } else {
+      formattedDate = `${format(newDate, "d 'de' MMM", {
+        locale: ptBR,
+      })}`;
+    }
+    return formattedDate;
+  };
 
   const handleCommentSubmit = () => {
     setShowCommentField((prev) => !prev);
@@ -81,17 +82,22 @@ export default function PostCard({
   return (
     <article className='flex w-full items-start gap-4 border-t border-gray-800 px-4 py-2'>
       <figure className='mt-2 flex w-12 flex-col items-center'>
-        <div className='flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-fuchsia-900'>
-          <Image
-            src={author.image ? author.image : AvatarMockup}
-            alt='Avatar do usuário'
-            width={48}
-            height={48}
-            className='h-full w-full object-cover'
-          />
-        </div>
+        <Link href={`users/${author.id}`}>
+          <div className='flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-fuchsia-900'>
+            <Image
+              src={author.image ? author.image : AvatarMockup}
+              alt='Avatar do usuário'
+              width={48}
+              height={48}
+              className='h-full w-full object-cover'
+            />
+          </div>
+        </Link>
       </figure>
-      <main id='content' className='flex w-full flex-col justify-between relative'>
+      <main
+        id='content'
+        className='relative flex w-full flex-col justify-between'
+      >
         <div id='user-name' className='pt-2'>
           <p className='break-words text-sm font-semibold'>{author.name}</p>
         </div>
@@ -100,7 +106,9 @@ export default function PostCard({
             <p className='text-sm lg:text-base'>{content}</p>
           </Link>
         </div>
-        <span className='text-xs text-gray-400 absolute right-0'>{formattedDate}</span>
+        <span className='absolute right-0 text-xs text-gray-400'>
+          {formatDate(createdAt)}
+        </span>
         <div id='post-actions' className='pt-4'>
           <nav role='navigation'>
             <ul className='flex gap-12'>
