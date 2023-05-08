@@ -24,7 +24,7 @@ interface Comment {
 }
 
 interface PostProps {
-  author: { name: string; image: string };
+  author: { name: string; image: string; id: string };
   comments: Comment[];
   content: string;
   createdAt: string;
@@ -70,22 +70,24 @@ export default function Post({ likedPostIds, post }: Props) {
           </Link>
         </div>
         <div>
-          <figure className='flex gap-3'>
-            <div className='flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-fuchsia-900'>
-              <Image
-                src={post.author.image ? post.author.image : AvatarMockup}
-                alt='Avatar do usuário'
-                width={48}
-                height={48}
-                className='h-full w-full object-cover'
-              />
-            </div>
-            <figcaption>
-              <div id='user-name'>
-                <p className='text-sm font-semibold'>{post.author.name}</p>
+          <Link href={`/users/${post.author.id}`}>
+            <figure className='flex gap-3'>
+              <div className='flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-fuchsia-900'>
+                <Image
+                  src={post.author.image ? post.author.image : AvatarMockup}
+                  alt='Avatar do usuário'
+                  width={48}
+                  height={48}
+                  className='h-full w-full object-cover'
+                />
               </div>
-            </figcaption>
-          </figure>
+              <figcaption>
+                <div id='user-name'>
+                  <p className='text-sm font-semibold'>{post.author.name}</p>
+                </div>
+              </figcaption>
+            </figure>
+          </Link>
           <div id='post-content' className='mt-4'>
             <p className='text-sm'>{post.content}</p>
           </div>
@@ -134,7 +136,7 @@ export default function Post({ likedPostIds, post }: Props) {
                   className='h-full w-full object-cover'
                 />
               </div>
-              <div className="flex flex-col gap-2">
+              <div className='flex flex-col gap-2'>
                 <p className='text-sm font-semibold'>{comment.author.name}</p>
                 <p className='text-sm'>{comment.content}</p>
                 <p className='text-sm text-gray-600'>
@@ -149,13 +151,6 @@ export default function Post({ likedPostIds, post }: Props) {
   );
 }
 
-// export const getStaticPaths: GetStaticPaths = async () => {
-//   return {
-//     paths: [],
-//     fallback: "blocking",
-//   };
-// };
-
 export const getServerSideProps: GetServerSideProps = async (context) => {
   console.log(context?.query);
   const { id } = context.query;
@@ -166,7 +161,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     where: { id: id as string },
     include: {
       author: {
-        select: { name: true, image: true },
+        select: { name: true, id: true, image: true },
       },
       comments: {
         select: {
