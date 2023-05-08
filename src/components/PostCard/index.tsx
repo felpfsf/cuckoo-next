@@ -13,15 +13,14 @@ interface PostCardProps {
   id: string;
   author: {
     name: string;
-    email: string;
     id: string;
     image: string;
   };
   content: string;
   createdAt: string;
-  isLiked: boolean;
-  likeCount: number;
-  commentCount: number;
+  isLiked?: boolean;
+  likeCount?: number;
+  commentCount?: number;
 }
 
 export default function PostCard({
