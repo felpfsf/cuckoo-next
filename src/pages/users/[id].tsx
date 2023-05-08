@@ -1,18 +1,29 @@
+import { useState } from "react";
 import type { GetServerSideProps } from "next";
 import { getSession, useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
+import { api } from "@/lib/axios";
 import { prisma } from "@/lib/prisma";
 import MainLayout from "@/components/MainLayout";
+import PostCard from "@/components/PostCard";
 import { BsArrowLeftShort } from "react-icons/bs";
 import AvatarMockup from "../../assets/avatar_mockup_2.png";
-import PostCard from "@/components/PostCard";
 
 interface UserProps {
   id: string;
   name: string;
   image: string;
   posts: Post[];
+  followers: Follows[];
+  following: Follows[];
+}
+
+interface Follows {
+  followerId: string;
+  followingId: string;
+  createdAt: string;
+  follower: UserProps[];
 }
 
 interface Like {
@@ -42,12 +53,28 @@ interface Post {
 
 interface UserPageProps {
   user: UserProps;
-  likedPostIds: any[];
+  likedPostIds: string[];
 }
 
 export default function UserPage({ user, likedPostIds }: UserPageProps) {
   const { data: session } = useSession();
   const isUserSession = session?.user.id === user.id;
+  const followingId = user.followers.map((item) => item.followingId);
+  const isFollowingUser = followingId.includes(user.id);
+  const [isFollowing, setIsFollowing] = useState(isFollowingUser);
+
+  const handleFollow = async (userId: string) => {
+    try {
+      await api.put("/api/user/follow", { id: userId });
+      setIsFollowing(true);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const followersCount = user.followers.length;
+  const followingCount = user.following.length;
+
   return (
     <MainLayout pageTitle={`Perfil de ${user.name} | Cuckoo`}>
       <div className='p-4'>
@@ -82,8 +109,11 @@ export default function UserPage({ user, likedPostIds }: UserPageProps) {
                 <strong>Editar Perfil</strong>
               </button>
             ) : (
-              <button className='rounded-3xl border px-6 py-2 transition-colors duration-200 ease-in-out hover:border-transparent hover:bg-fuchsia-500'>
-                <strong>Seguir</strong>
+              <button
+                className='rounded-3xl border px-6 py-2 transition-colors duration-200 ease-in-out hover:border-transparent hover:bg-fuchsia-500'
+                onClick={() => handleFollow(user.id)}
+              >
+                <strong>{isFollowing ? "Deixar de seguir" : "Seguir"}</strong>
               </button>
             )}
           </div>
@@ -93,10 +123,10 @@ export default function UserPage({ user, likedPostIds }: UserPageProps) {
           <h2>Bioo</h2>
           <div className='flex gap-8'>
             <span>
-              <strong>0</strong> Seguindo
+              <strong>{followingCount}</strong> Seguindo
             </span>
             <span>
-              <strong>0</strong> Seguindores
+              <strong>{followersCount}</strong> Seguidores
             </span>
           </div>
         </div>
@@ -143,11 +173,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
         orderBy: { createdAt: "desc" },
       },
-      followers: true,
-      following: true,
+      followers: {
+        include: {
+          follower: true,
+        },
+      },
+      following: {
+        include: {
+          following: true,
+        },
+      },
     },
   });
-
+  console.log(user);
   const likedPosts = await prisma.like.findMany({
     where: { userId: currentUserId },
     select: { postId: true },
