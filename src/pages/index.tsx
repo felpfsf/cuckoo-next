@@ -17,7 +17,7 @@ interface Comment {
 }
 
 interface PostProps {
-  author: { name: string; email: string; id: string; image: string };
+  author: { name: string; id: string; image: string };
   comments: Comment[];
   content: string;
   createdAt: string;
@@ -33,21 +33,19 @@ interface FeedProps {
 function Home({ feed, likedPostIds }: FeedProps) {
   return (
     <MainLayout pageTitle='Página Principal - Cuckoo'>
-      <h1 className='px-4 py-2 text-xl font-semibold'>Página Inicial</h1>
-      <div className=''>
-        <div className='flex flex-col'>
-          {feed.map((post) => {
-            return (
-              <PostCard
-                key={post.id}
-                isLiked={likedPostIds.includes(post.id)}
-                likeCount={post.likes.length}
-                commentCount={post.comments.length}
-                {...post}
-              />
-            );
-          })}
-        </div>
+      <h1 className='px-4 pt-6 text-xl font-semibold'>Página Inicial</h1>
+      <div className='flex flex-col'>
+        {feed.map((post) => {
+          return (
+            <PostCard
+              key={post.id}
+              isLiked={likedPostIds.includes(post.id)}
+              likeCount={post.likes.length}
+              commentCount={post.comments.length}
+              {...post}
+            />
+          );
+        })}
       </div>
     </MainLayout>
   );
@@ -61,7 +59,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const feed = await prisma.post.findMany({
     include: {
       author: {
-        select: { name: true, email: true, id: true, image: true },
+        select: { name: true, id: true, image: true },
       },
       likes: true,
       comments: true,
