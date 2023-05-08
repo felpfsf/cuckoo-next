@@ -17,7 +17,7 @@ interface Comment {
 }
 
 interface PostProps {
-  author: { name: string; email: string; image: string };
+  author: { name: string; email: string; id: string; image: string };
   comments: Comment[];
   content: string;
   createdAt: string;
@@ -61,7 +61,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const feed = await prisma.post.findMany({
     include: {
       author: {
-        select: { name: true, email: true, image: true },
+        select: { name: true, email: true, id: true, image: true },
       },
       likes: true,
       comments: true,
