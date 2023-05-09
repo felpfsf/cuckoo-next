@@ -113,7 +113,8 @@ export default function UserPage({ user, likedPostIds }: UserPageProps) {
               </button>
             ) : (
               <button
-                className='rounded-3xl border px-6 py-2 transition-colors duration-200 ease-in-out hover:border-transparent hover:bg-fuchsia-500'
+                className='rounded-3xl border px-6 py-2 transition-colors duration-200 ease-in-out hover:border-transparent hover:bg-fuchsia-500 disabled:pointer-events-none disabled:cursor-default disabled:opacity-60'
+                disabled={!session}
                 onClick={() => handleFollow(user.id)}
               >
                 <strong>{isFollowing ? "Deixar de seguir" : "Seguir"}</strong>
