@@ -1,5 +1,7 @@
 # Cuckoo
 
+[img]()
+
 [English Version](./README_EN.md)
 
 O Cuckoo é uma rede social similar ao Twitter, onde os usuários podem postar, comentar e curtir os posts e também podem seguir outros usuários e receber atualizações em seu feed de notícias.
