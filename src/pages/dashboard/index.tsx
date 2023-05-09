@@ -96,7 +96,7 @@ export default function Dashboard({ user }: UserProps) {
     }
   };
   return (
-    <MainLayout pageTitle='Dashboard - Cuckoo'>
+    <MainLayout pageTitle={`Editar perfil de ${user.name} - Cuckoo`}>
       <div className='p-4'>
         <div className='mb-8'>
           <Link href={"/"} className='group flex items-center gap-4'>
@@ -122,7 +122,7 @@ export default function Dashboard({ user }: UserProps) {
               <p className='text-xl font-semibold'>{user.name}</p>
             </figcaption>
           </figure>
-          <h1 className='mt-4 text-xl font-semibold'>
+          <h1 className='mb-12 mt-4 text-xl font-semibold'>
             Deseja alterar seus dados?
           </h1>
           <form
