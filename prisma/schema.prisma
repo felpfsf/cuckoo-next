@@ -49,6 +49,7 @@ model User {
   password      String?
   salt          String?
   image         String?
+  bio           String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   posts         Post[]
