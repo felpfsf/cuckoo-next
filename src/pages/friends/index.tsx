@@ -106,7 +106,6 @@ export default function UserFollows({
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
   const userSessionId = session?.user.id;
-  console.log(session);
   const user =
     session &&
     (await prisma.user.findUnique({
@@ -141,9 +140,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       following: true,
     },
   });
-
-  console.log(followers);
-  console.log(followings);
 
   return {
     props: {
