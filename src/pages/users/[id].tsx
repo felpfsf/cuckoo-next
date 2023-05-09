@@ -14,6 +14,7 @@ interface UserProps {
   id: string;
   name: string;
   image: string;
+  bio: string;
   posts: Post[];
   followers: Follows[];
   following: Follows[];
@@ -59,8 +60,10 @@ interface UserPageProps {
 export default function UserPage({ user, likedPostIds }: UserPageProps) {
   const { data: session } = useSession();
   const isUserSession = session?.user.id === user.id;
-  const followingId = user.followers.map((item) => item.followingId);
-  const isFollowingUser = followingId.includes(user.id);
+
+  const currentUserId = session?.user.id as string;
+  const followingId = user.followers.map((item) => item.followerId);
+  const isFollowingUser = followingId.includes(currentUserId);
   const [isFollowing, setIsFollowing] = useState(isFollowingUser);
 
   const handleFollow = async (userId: string) => {
@@ -120,7 +123,7 @@ export default function UserPage({ user, likedPostIds }: UserPageProps) {
         </div>
         {/* Bio */}
         <div className='mt-4 flex flex-col gap-4'>
-          <h2>Bioo</h2>
+          <h2>{user.bio}</h2>
           <div className='flex gap-8'>
             <span>
               <strong>{followingCount}</strong> Seguindo
@@ -185,7 +188,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     },
   });
-  console.log(user);
+  // console.log(user);
   const likedPosts = await prisma.like.findMany({
     where: { userId: currentUserId },
     select: { postId: true },
