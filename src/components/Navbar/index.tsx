@@ -50,7 +50,7 @@ export default function Navbar() {
                   className='group flex items-center gap-3'
                   tabIndex={2}
                 >
-                  <FaUser
+                  {/* <FaUser
                     size={26}
                     className={
                       pathname === "/dashboard" ? "text-fuchsia-200" : ""
@@ -64,7 +64,33 @@ export default function Navbar() {
                     }`}
                   >
                     Perfil
-                  </span>
+                  </span> */}
+                  <figure className='flex w-full items-center gap-2'>
+                    <div className='flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-2 bg-fuchsia-900 lg:h-16 lg:w-16'>
+                      <Image
+                        src={
+                          session?.user.image
+                            ? session.user.image
+                            : AvatarMockup
+                        }
+                        alt='Avatar do usuário'
+                        width={64}
+                        height={64}
+                        className='h-full w-full object-cover'
+                      />
+                    </div>
+                    <figcaption>
+                      <span
+                        className={`hidden border-b-2 text-xl font-bold group-hover:border-b-neutral-200 lg:block ${
+                          pathname === "/dashboard"
+                            ? "border-b-fuchsia-200"
+                            : "border-b-transparent"
+                        }`}
+                      >
+                        Perfil
+                      </span>
+                    </figcaption>
+                  </figure>
                 </Link>
               </li>
               <li>
@@ -91,20 +117,6 @@ export default function Navbar() {
                   </span>
                 </Link>
               </li>
-              {/* <li className='w-full'>
-            <Dialog.Root>
-              <Dialog.Trigger asChild>
-                <button
-                  aria-label='Botão para Postar'
-                  className='btn_hover hidden w-full items-center justify-center rounded-3xl border border-none bg-fuchsia-600 p-3 font-semibold text-white transition-colors duration-200 ease-in-out disabled:cursor-not-allowed disabled:opacity-60 lg:flex'
-                  tabIndex={4}
-                >
-                  Novo Post
-                </button>
-              </Dialog.Trigger>
-              <CreatePost />
-            </Dialog.Root>
-          </li> */}
               <li>
                 <Dialog.Root>
                   <Dialog.Trigger asChild>
@@ -114,13 +126,7 @@ export default function Navbar() {
                       className='group flex items-center gap-3'
                     >
                       <ImPencil2 size={26} />
-                      <span
-                        className={`hidden border-b-2 text-xl font-bold group-hover:border-b-neutral-200 lg:block ${
-                          pathname === "/friends"
-                            ? "border-b-neutral-200"
-                            : "border-b-transparent"
-                        }`}
-                      >
+                      <span className='hidden border-b-2 border-b-transparent text-xl font-bold group-hover:border-b-neutral-200 lg:block'>
                         Novo Post
                       </span>
                     </button>
@@ -156,7 +162,7 @@ export default function Navbar() {
             </>
           )}
         </ul>
-        {session && (
+        {/* {session && (
           <Link href={`/dashboard`}>
             <figure className='flex w-full items-center gap-2'>
               <div className='flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-2 bg-fuchsia-900 lg:h-16 lg:w-16'>
@@ -175,7 +181,7 @@ export default function Navbar() {
               </figcaption>
             </figure>
           </Link>
-        )}
+        )} */}
       </nav>
     </aside>
   );
