@@ -1,5 +1,7 @@
 # Cuckoo
 
+[PTBR Version](./README.md)
+
 Cuckoo is a social network similar to Twitter, where users can post, comment, and like other users' posts. Users can also follow other users and receive updates on their newsfeed.
 
 ## Technologies Used
@@ -8,12 +10,12 @@ The project was developed using the TypeScript programming language with the Nex
 
 ## Features
 
--Post messages
--Comments on posts
--Likes on posts
--Following other users
--Newsfeed
--User authentication
+- Post messages
+- Comments on posts
+- Likes on posts
+- Following other users
+- Newsfeed
+- User authentication
 
 ## Installation
 
