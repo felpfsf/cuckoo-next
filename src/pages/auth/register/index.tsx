@@ -3,19 +3,15 @@ import { useRouter } from "next/router";
 import { getSession } from "next-auth/react";
 import type { GetServerSideProps } from "next";
 import Link from "next/link";
-
 import { AxiosError } from "axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
+import { RegisterInputProps, registerSchema } from "@/models/user.schemas";
 import { api } from "@/lib/axios";
 import Balancer from "react-wrap-balancer";
-
 import PublicLayout from "@/components/PublicLayout";
-
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FiAlertCircle, FiEyeOff, FiEye } from "react-icons/fi";
-import { RegisterInputProps, registerSchema } from "@/models/user.schemas";
 
 export default function SignUp() {
   const [authError, setAuthError] = useState<string>("");
@@ -32,8 +28,7 @@ export default function SignUp() {
     register,
   } = useForm<RegisterInputProps>({ resolver: zodResolver(registerSchema) });
 
-  const submitUser = async (data: any) => {
-    // console.log("Register data ->", data);
+  const submitUser = async (data: RegisterInputProps) => {
     try {
       await api.post("/api/user/signup", data).then((response) => {
         if (response.data) {
