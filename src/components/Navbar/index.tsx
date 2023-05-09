@@ -95,25 +95,25 @@ export default function Navbar() {
               </li>
               <li>
                 <Link
-                  href={"/friends"}
-                  aria-label='Link para a página de amigos'
+                  href={"/follows"}
+                  aria-label='Link para a página de seguidores'
                   className='group flex items-center gap-3'
                   tabIndex={3}
                 >
                   <FaUsers
                     size={26}
                     className={
-                      pathname === "/friends" ? "text-fuchsia-200" : ""
+                      pathname === "/follows" ? "text-fuchsia-200" : ""
                     }
                   />
                   <span
                     className={`hidden border-b-2 text-xl font-bold group-hover:border-b-neutral-200 lg:block ${
-                      pathname === "/friends"
+                      pathname === "/follows"
                         ? "border-b-neutral-200"
                         : "border-b-transparent"
                     }`}
                   >
-                    Amigos
+                    Seguidores
                   </span>
                 </Link>
               </li>
