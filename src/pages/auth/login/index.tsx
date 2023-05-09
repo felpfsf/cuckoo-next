@@ -172,7 +172,7 @@ export default function SignIn() {
             Google
           </button>
           <button
-            title='Entre usando sua conta Github'
+            title='Entre usando sua conta Github - Ainda não implementado'
             disabled
             aria-disabled='true'
             className='flex flex-col items-center gap-2 disabled:cursor-not-allowed'
