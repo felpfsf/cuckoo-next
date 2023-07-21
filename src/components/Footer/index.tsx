@@ -54,7 +54,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href={"/friends"}
+                  href={"/follows"}
                   aria-label='Link para a página de amigos'
                   tabIndex={3}
                 >
